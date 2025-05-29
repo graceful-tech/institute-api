@@ -10,4 +10,7 @@ public class InstituteApiApplication {
 		SpringApplication.run(InstituteApiApplication.class, args);
 	}
 
+	public void message() {
+
+	}
 }
