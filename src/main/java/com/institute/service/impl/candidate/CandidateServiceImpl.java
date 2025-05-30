@@ -34,7 +34,6 @@ public class CandidateServiceImpl implements CandidateService {
 		Long id = null;
 
 		try {
-
 			candidateEntity = candidatesRepository.getCandidateDetailsByMobileNumber(candiateDto.getMobileNumber());
 
 			if (Objects.nonNull(candidateEntity)) {

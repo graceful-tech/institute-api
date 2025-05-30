@@ -11,34 +11,31 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.institute.dto.candidate.CandidateDto;
-import com.institute.service.candidate.CandidateService;
-
-import jakarta.servlet.http.HttpServletRequest;
+import com.institute.dto.candidate.CourseDto;
+import com.institute.service.candidate.CourseService;
 
 @RestController
-@RequestMapping("/candidate")
-public class CandidateController {
+@RequestMapping("/course")
+public class CourseController {
 
-	private static final Logger logger = LoggerFactory.getLogger(CandidateController.class);
+	private static final Logger logger = LoggerFactory.getLogger(CourseController.class);
 
 	@Autowired
-	CandidateService candidateService;
+	CourseService courseService;
 
 	@PostMapping("/create")
-	public ResponseEntity<?> createCandidate(@RequestBody CandidateDto candidateDto,
-			@RequestHeader("username") String username, @RequestHeader("userid") Long userid) {
+	public ResponseEntity<?> createCource(@RequestBody CourseDto courseDto, @RequestHeader("username") String username,
+			@RequestHeader("userid") Long userid) {
 		logger.debug("Controller :: createCandidate :: Entered");
 
 		if (userid != null) {
-			candidateDto.setCreatedUser(Long.valueOf(userid));
+			courseDto.setCreatedUser(Long.valueOf(userid));
 		}
 
-		Long id = candidateService.createCandidate(candidateDto, username);
+		Long id = courseService.createCourse(courseDto, username);
 
 		logger.debug("Controller :: createCandidate :: Exited");
 
 		return new ResponseEntity<>(id, HttpStatus.OK);
 	}
-
 }
