@@ -1,55 +1,33 @@
-package com.institute.entity.candidate;
+package com.institute.dto.candidate;
 
 import java.time.LocalDate;
 
-import com.institute.entity.common.BaseEntity;
+import com.institute.dto.BaseDto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
+public class CourseDto extends BaseDto {
 
-@Entity
-@Table(name = "course")
-public class CourseEntity extends BaseEntity {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = true, length = 30)
 	private String courseName;
 
-	@Column(nullable = true, length = 20)
 	private String mode;
 
-	@Column(nullable = true, length = 20)
 	private String batchPreference;
 
-	@Column(nullable = true, length = 20)
 	private String batchName;
 
-	@Column(nullable = true)
 	private LocalDate batchStartDate;
 
-	@Column(nullable = true)
 	private LocalDate batchEndDate;
 
-	@Column(nullable = true, length = 30)
 	private String counsellorName;
 
-	@Column(nullable = true, length = 30)
 	private String leadSource;
 
-	@Column(nullable = true)
 	private String status;
 
-	@Column(nullable = true)
 	private LocalDate followUpDate;
 
-	@Column(nullable = false)
 	private Long candidateId;
 
 	public Long getId() {
