@@ -28,7 +28,6 @@ public class UserServiceImpl implements UserService {
 		boolean status = false;
 		UserEntity makeProfileUserEntity = null;
 		try {
-//			userRepository.findByMobileNumberAndEmail(userDto.getMobileNumber(), userDto.getEmail());
 			if (userRepository.findByMobileNumberAndEmail(userDto.getMobileNumber(), userDto.getEmail()) == 0) {
 				status = true;
 			}
