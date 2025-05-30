@@ -14,19 +14,15 @@ import com.institute.dto.user.UserDto;
 import com.institute.service.user.UserService;
 import com.institute.utility.CommonConstants;
 
-
-
 @RestController
 @RequestMapping("/user")
 public class UserController {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-	
-	
+
 	@Autowired
-	UserService userService; 
-	
-	
+	UserService userService;
+
 	@PostMapping("/create")
 	public ResponseEntity<?> createUser(@RequestBody UserDto userDto) {
 		logger.debug("UserController :: createUser :: Entered");
@@ -36,10 +32,10 @@ public class UserController {
 		logger.debug("UserController :: createUser :: Exited");
 		if (!user) {
 			logger.debug("UserController :: createUser :: Error");
-			return new ResponseEntity<>(buildResponse(CommonConstants.PM_0003), HttpStatus.BAD_REQUEST);
+			// return new ResponseEntity<>(buildResponse(CommonConstants.PM_0003),
+			// HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<>(buildResponse(CommonConstants.PM_0004), HttpStatus.OK);
+		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
-
 
 }
