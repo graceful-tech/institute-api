@@ -6,4 +6,6 @@ public interface CourseService {
 
 	Long createCourse(CourseDto courseDto, String username);
 
+	CourseDto getCourseById(Long id);
+
 }

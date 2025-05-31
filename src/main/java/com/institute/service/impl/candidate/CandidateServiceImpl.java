@@ -7,10 +7,15 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.institute.dto.WrapperDto;
 import com.institute.dto.candidate.CandidateDto;
+import com.institute.dto.candidate.SearchCandidateDto;
 import com.institute.entity.candidate.CandidateEntity;
+import com.institute.repository.candidate.CandidateCustomRepository;
 import com.institute.repository.candidate.CandidateRepository;
 import com.institute.service.candidate.CandidateService;
 
@@ -25,12 +30,16 @@ public class CandidateServiceImpl implements CandidateService {
 	@Autowired
 	ModelMapper modelMapper;
 
+	@Autowired
+	CandidateCustomRepository candidateCustomRepository;
+
 	@Override
 	public Long createCandidate(CandidateDto candiateDto, String username) {
 		logger.debug("Service :: createCandidate :: Entered");
 
 		CandidateEntity candidateEntity = null;
-		CandidateEntity saveCandiate = null;
+		CandidateEntity saveCandidate = null;
+		CandidateEntity Candidate = null;
 		Long id = null;
 
 		try {
@@ -44,26 +53,64 @@ public class CandidateServiceImpl implements CandidateService {
 				candidateEntity.setModifiedUser(candiateDto.getCreatedUser());
 				candidateEntity.setCreatedUserName(username);
 
-				saveCandiate = candidatesRepository.save(candidateEntity);
+				saveCandidate = candidatesRepository.save(candidateEntity);
 
-				id = saveCandiate.getId();
+				id = saveCandidate.getId();
 			} else {
 				candidateEntity = modelMapper.map(candiateDto, CandidateEntity.class);
 				candidateEntity.setCreatedDate(LocalDateTime.now());
 				candidateEntity.setCreatedUser(candiateDto.getCreatedUser());
 				candidateEntity.setCreatedUserName(username);
 
-				saveCandiate = candidatesRepository.save(candidateEntity);
+				saveCandidate = candidatesRepository.save(candidateEntity);
 
-				id = saveCandiate.getId();
+				id = saveCandidate.getId();
 			}
-
+			candidateEntity = null;
+			saveCandidate = null;
+			Candidate = null;
 		} catch (Exception e) {
 			logger.error("Service :: createCandidate :: Exception :: " + e.getMessage());
 		}
 		logger.debug("Service :: createCandidate :: Exited");
 
 		return id;
+	}
+
+	@Override
+	public CandidateDto getCandidateById(Long id) {
+		logger.debug("Service :: getCandidateById :: Entered");
+
+		CandidateEntity candidateById = null;
+		CandidateDto candidate = null;
+
+		try {
+			candidateById = candidatesRepository.getCandidateById(id);
+			candidate = modelMapper.map(candidateById, CandidateDto.class);
+
+			candidateById = null;
+
+		} catch (Exception e) {
+			logger.error("Service :: getCandidateById :: Exception :: " + e.getMessage());
+		}
+		logger.debug("Service :: getCandidateById :: Exited");
+		return candidate;
+	}
+
+	@Override
+	public WrapperDto<SearchCandidateDto> searchCandidate(SearchCandidateDto SearchCandidateDto, String userName) {
+
+		logger.debug("Service :: searchCandidate :: Entered");
+
+		WrapperDto<SearchCandidateDto> candidateWrapperDto = null;
+		try {
+			Pageable pageable = PageRequest.of(SearchCandidateDto.getPage(), SearchCandidateDto.getLimit());
+			candidateWrapperDto = candidateCustomRepository.searchCandidate(SearchCandidateDto, pageable);
+		} catch (Exception e) {
+			logger.error("Service :: shareSearchCandidates :: Exception :: " + e.getMessage());
+		}
+		logger.debug("Service :: shareSearchCandidates :: Exited");
+		return candidateWrapperDto;
 	}
 
 }

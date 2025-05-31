@@ -21,4 +21,7 @@ public interface CandidateRepository extends JpaRepository<CandidateEntity, Long
 	@Query(value = "select * from candidates where created_username = :createdUserName ", nativeQuery = true)
 	CandidateEntity getCandidateByUserName(@Param("createdUserName") String createdUserName);
 
+	@Query(value = "select * from candidates where id  = :id ", nativeQuery = true)
+	CandidateEntity getCandidateById(@Param("id") Long id);
+
 }
