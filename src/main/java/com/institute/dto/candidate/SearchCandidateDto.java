@@ -14,16 +14,6 @@ public class SearchCandidateDto extends BaseDto {
 
 	private String email;
 
-	private String nationality;
-
-	private String gender;
-
-	private String languagesKnown;
-
-	private String address;
-
-	private String maritalStatus;
-
 	private String parentContact;
 
 	private String location;
@@ -42,15 +32,17 @@ public class SearchCandidateDto extends BaseDto {
 
 	private LocalDate batchEndDate;
 
-	private String counsellorName;
-
-	private String leadSource;
-
 	private String status;
 
-	private LocalDate followUpDate;
-
 	private Long candidateId;
+
+	private String userName;
+
+	private Long loggedUserId;
+
+	private String search;
+
+	private String modifiedUserName;
 
 	public Long getId() {
 		return id;
@@ -82,46 +74,6 @@ public class SearchCandidateDto extends BaseDto {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public String getNationality() {
-		return nationality;
-	}
-
-	public void setNationality(String nationality) {
-		this.nationality = nationality;
-	}
-
-	public String getGender() {
-		return gender;
-	}
-
-	public void setGender(String gender) {
-		this.gender = gender;
-	}
-
-	public String getLanguagesKnown() {
-		return languagesKnown;
-	}
-
-	public void setLanguagesKnown(String languagesKnown) {
-		this.languagesKnown = languagesKnown;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	public String getMaritalStatus() {
-		return maritalStatus;
-	}
-
-	public void setMaritalStatus(String maritalStatus) {
-		this.maritalStatus = maritalStatus;
 	}
 
 	public String getParentContact() {
@@ -196,22 +148,6 @@ public class SearchCandidateDto extends BaseDto {
 		this.batchEndDate = batchEndDate;
 	}
 
-	public String getCounsellorName() {
-		return counsellorName;
-	}
-
-	public void setCounsellorName(String counsellorName) {
-		this.counsellorName = counsellorName;
-	}
-
-	public String getLeadSource() {
-		return leadSource;
-	}
-
-	public void setLeadSource(String leadSource) {
-		this.leadSource = leadSource;
-	}
-
 	public String getStatus() {
 		return status;
 	}
@@ -220,20 +156,44 @@ public class SearchCandidateDto extends BaseDto {
 		this.status = status;
 	}
 
-	public LocalDate getFollowUpDate() {
-		return followUpDate;
-	}
-
-	public void setFollowUpDate(LocalDate followUpDate) {
-		this.followUpDate = followUpDate;
-	}
-
 	public Long getCandidateId() {
 		return candidateId;
 	}
 
 	public void setCandidateId(Long candidateId) {
 		this.candidateId = candidateId;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public Long getLoggedUserId() {
+		return loggedUserId;
+	}
+
+	public void setLoggedUserId(Long loggedUserId) {
+		this.loggedUserId = loggedUserId;
+	}
+
+	public String getSearch() {
+		return search;
+	}
+
+	public void setSearch(String search) {
+		this.search = search;
+	}
+
+	public String getModifiedUserName() {
+		return modifiedUserName;
+	}
+
+	public void setModifiedUserName(String modifiedUserName) {
+		this.modifiedUserName = modifiedUserName;
 	}
 
 }

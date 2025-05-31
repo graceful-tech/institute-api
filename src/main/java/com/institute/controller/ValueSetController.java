@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.institute.dto.ValueSetDto;
-import com.institute.repository.user.ValueSetService;
-
+import com.institute.service.ValueSetService;
+ 
 @RestController
 @RequestMapping("/value-sets")
 public class ValueSetController {

@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "value_sets", schema = "hurecom_v2")
+@Table(name = "value_sets")
 public class ValueSetEntity {
 
 	@Id

@@ -11,9 +11,12 @@ import jakarta.transaction.Transactional;
 
 @Repository
 @Transactional
-public interface UserRepository extends JpaRepository<UserEntity, Long>{
-	
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
+
 	@Query(value = "select count(id) from user where email = :email or mobile_number = :mobileNumber ", nativeQuery = true)
 	int findByMobileNumberAndEmail(@Param("mobileNumber") String mobileNumber, @Param("email") String email);
+
+	@Query(value = "select id from users where user_name = :userName", nativeQuery = true)
+	Long getUserId(@Param("userName") String userName);
 
 }

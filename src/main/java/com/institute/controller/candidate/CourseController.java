@@ -26,19 +26,17 @@ public class CourseController {
 	@Autowired
 	CourseService courseService;
 
-	
 	@PostMapping("/create")
-	public ResponseEntity<?> createCource(@RequestBody CourseDto courseDto
-//			@RequestHeader("username") String username,
-//			@RequestHeader("userid") Long userid
-			
-			) {
+	public ResponseEntity<?> createCource(@RequestBody CourseDto courseDto, @RequestHeader("username") String username,
+			@RequestHeader("userid") Long userid
+
+	) {
 		logger.debug("Controller :: createCource :: Entered");
 
-//		if (userid != null) {
-//			courseDto.setCreatedUser(Long.valueOf(userid));
-//		}
-		Long id = courseService.createCourse(courseDto, "keerthi");
+		if (userid != null) {
+			courseDto.setCreatedUser(Long.valueOf(userid));
+		}
+		Long id = courseService.createCourse(courseDto, username);
 
 		logger.debug("Controller :: createCource :: Exited");
 		return new ResponseEntity<>(id, HttpStatus.OK);

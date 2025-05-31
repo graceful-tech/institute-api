@@ -30,7 +30,7 @@ public class CourseServiceImpl implements CourseService {
 		logger.debug("Service :: createCourse :: Entered");
 
 		CourseEntity courseEntity = null;
-		CourseEntity candidateEntity = null;
+		CourseEntity course = null;
 		CourseEntity saveCourseEntity = null;
 		Long id = null;
 
@@ -38,25 +38,25 @@ public class CourseServiceImpl implements CourseService {
 			courseEntity = courseRepository.getCourseByCandidateId(courseDto.getCandidateId());
 
 			if (Objects.nonNull(courseEntity)) {
-				candidateEntity = modelMapper.map(courseDto, CourseEntity.class);
-				candidateEntity.setModifiedDate(LocalDateTime.now());
-				candidateEntity.setModifiedUser(courseDto.getCreatedUser());
-				candidateEntity.setCandidateId(courseDto.getCandidateId());
+				course = modelMapper.map(courseDto, CourseEntity.class);
+				course.setModifiedDate(LocalDateTime.now());
+				course.setModifiedUser(courseDto.getCreatedUser());
+				course.setCandidateId(courseDto.getCandidateId());
 
-				saveCourseEntity = courseRepository.save(courseEntity);
+				saveCourseEntity = courseRepository.save(course);
 
 				id = saveCourseEntity.getId();
 			} else {
-				candidateEntity = modelMapper.map(courseDto, CourseEntity.class);
-				candidateEntity.setCreatedUserName(username);
-				candidateEntity.setCreatedDate(LocalDateTime.now());
+				course = modelMapper.map(courseDto, CourseEntity.class);
+				course.setCreatedUserName(username);
+				course.setCreatedDate(LocalDateTime.now());
 
-				saveCourseEntity = courseRepository.save(courseEntity);
+				saveCourseEntity = courseRepository.save(course);
 
 				id = saveCourseEntity.getId();
 			}
 			courseEntity = null;
-			candidateEntity = null;
+			course = null;
 			saveCourseEntity = null;
 
 		} catch (Exception e) {

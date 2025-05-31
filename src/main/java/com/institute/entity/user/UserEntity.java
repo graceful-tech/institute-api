@@ -1,5 +1,7 @@
 package com.institute.entity.user;
 
+import com.institute.entity.common.BaseEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,25 +12,25 @@ import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "user", uniqueConstraints = { @UniqueConstraint(columnNames = "email"),
-		@UniqueConstraint(columnNames = "mobileNumber"),@UniqueConstraint(columnNames = "userName")})
-public class UserEntity {
-	
+		@UniqueConstraint(columnNames = "mobileNumber"), @UniqueConstraint(columnNames = "userName") })
+public class UserEntity extends BaseEntity {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@Column
 	private String name;
-	
+
 	@Column(nullable = false, unique = true)
 	private String mobileNumber;
-	
+
 	@Column(nullable = false, unique = true)
 	private String email;
-	
+
 	@Column(nullable = false, unique = true)
 	private String userName;
-	
+
 	@Column
 	private String password;
 
@@ -79,5 +81,5 @@ public class UserEntity {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
 }

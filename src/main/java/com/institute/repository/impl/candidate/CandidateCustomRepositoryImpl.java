@@ -1,7 +1,10 @@
 package com.institute.repository.impl.candidate;
 
+import java.lang.ref.WeakReference;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 
 import org.slf4j.Logger;
@@ -15,6 +18,7 @@ import com.institute.dto.candidate.SearchCandidateDto;
 import com.institute.repository.candidate.CandidateCustomRepository;
 import com.institute.repository.candidate.CandidateRepository;
 import com.institute.repository.candidate.CourseRepository;
+import com.institute.utility.CommonUtils;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -33,10 +37,39 @@ public class CandidateCustomRepositoryImpl implements CandidateCustomRepository 
 	@Autowired
 	CourseRepository courseRepository;
 
-	private static final BiFunction<SearchCandidateDto, List<Object>, String> search_candidates_filter = (
+	private static final BiFunction<SearchCandidateDto, List<Object>, String> search_candidate_parameters = (
 			searchCandidateDto, params) -> {
 
 		StringBuilder sb = new StringBuilder();
+
+		if (Objects.nonNull(searchCandidateDto.getSearch()) && !searchCandidateDto.getSearch().isEmpty()) {
+			sb.append(" and (upper(candidate.name) like upper(?) or upper(candidate.mobile_number) like upper(?) "
+					+ "or upper(candidate.email) like upper(?)) ");
+			params.add(CommonUtils.appendLikeOperator(searchCandidateDto.getSearch()));
+			params.add(CommonUtils.appendLikeOperator(searchCandidateDto.getSearch()));
+			params.add(CommonUtils.appendLikeOperator(searchCandidateDto.getSearch()));
+		}
+
+		if (Objects.nonNull(searchCandidateDto.getUserName()) && !searchCandidateDto.getUserName().isEmpty()) {
+			sb.append(" and course_candidate.created_username = ? ");
+			params.add(searchCandidateDto.getUserName());
+		}
+
+		if (Objects.nonNull(searchCandidateDto.getBatchName()) && !searchCandidateDto.getBatchName().isEmpty()) {
+			sb.append(" and course_candidate.batch_name = ? ");
+			params.add(searchCandidateDto.getBatchName());
+		}
+
+		if (Objects.nonNull(searchCandidateDto.getBatchPreference())
+				&& !searchCandidateDto.getBatchPreference().isEmpty()) {
+			sb.append(" and course_candidate.batch_preference = ? ");
+			params.add(searchCandidateDto.getBatchPreference());
+		}
+
+		if (Objects.nonNull(searchCandidateDto.getMode()) && !searchCandidateDto.getMode().isEmpty()) {
+			sb.append(" and course_candidate.mode = ? ");
+			params.add(searchCandidateDto.getMode());
+		}
 
 		return sb.toString();
 	};
@@ -46,6 +79,25 @@ public class CandidateCustomRepositoryImpl implements CandidateCustomRepository 
 
 		StringBuilder sb = new StringBuilder();
 
+		sb.append(
+				" select candidate.id, candidate.name, candidate.mobile_number, candidate.email, candidate.qualification ,candidate.location ,candidate.created_username, "
+						+ "candidate.created_date, candidate.modified_date, course_candidate.mode, "
+						+ "course_candidate.batch_preference , course_candidate.batch_name, course_candidate.status "
+						+ "from candidates candidate left join user created_user on created_user.id = candidate.created_user  "
+						+ "left join course course_candidate on course_candidate.candidate_id = candidate.id where 1 = 1 ");
+
+		if (searchCandidateDto.getLoggedUserId() != 1) {
+			sb.append("and candidate.created_username = ? ");
+			params.add(searchCandidateDto.getLoggedUserName());
+		}
+
+		String parameters = null;
+		parameters = search_candidate_parameters.apply(searchCandidateDto, params);
+
+		if (Objects.nonNull(parameters) && !parameters.isEmpty()) {
+			sb.append(parameters);
+		}
+
 		return sb.toString();
 	};
 
@@ -54,8 +106,10 @@ public class CandidateCustomRepositoryImpl implements CandidateCustomRepository 
 		logger.error("Repository :: searchCandidate :: Entered");
 
 		List<Object> params = new ArrayList<>();
-		WrapperDto<SearchCandidateDto> wrapper = new WrapperDto<>();
+		WrapperDto<SearchCandidateDto> wrapperDto = new WrapperDto<>();
 		List<SearchCandidateDto> candidateList = new ArrayList<>();
+		WeakReference<List<SearchCandidateDto>> weakListRef = new WeakReference<>(candidateList);
+
 
 		try {
 
@@ -71,17 +125,74 @@ public class CandidateCustomRepositoryImpl implements CandidateCustomRepository 
 
 			List<Object[]> results = query.getResultList();
 
+			results.forEach(result -> {
+				SearchCandidateDto searchCandidate = new SearchCandidateDto();
+
+				searchCandidate.setId((Long) result[0]);
+				searchCandidate.setName((String) result[1]);
+				searchCandidate.setMobileNumber((String) result[2]);
+				searchCandidate.setEmail((String) result[3]);
+				searchCandidate.setQualification((String) result[4]);
+				searchCandidate.setLocation((String) result[5]);
+				searchCandidate.setCreatedUserName((String) result[6]);
+
+				Timestamp createdDate = (Timestamp) result[7];
+
+				if (Objects.nonNull(createdDate)) {
+					searchCandidate.setCreatedDate(createdDate.toLocalDateTime());
+				}
+
+				Timestamp modifiedDate = (Timestamp) result[8];
+
+				if (Objects.nonNull(modifiedDate)) {
+					searchCandidate.setModifiedDate(modifiedDate.toLocalDateTime());
+				}
+
+				searchCandidate.setMode((String) result[9]);
+				searchCandidate.setBatchPreference((String) result[10]);
+				searchCandidate.setBatchName((String) result[11]);
+				searchCandidate.setStatus((String) result[12]);
+				
+
+				weakListRef.get().add(searchCandidate);
+				
+				searchCandidate = null;
+
+			});
+			
+			wrapperDto.setResults(weakListRef.get());
+			wrapperDto.setTotalRecords(getSearchCandidateCount(searchCandidateDto));
+
+			candidateList = null;
+
+
 		} catch (Exception e) {
 			logger.error("Repository :: searchCandidate :: Exception :: " + e.getMessage());
 		}
 		logger.debug("Repository :: searchCandidate :: Exited");
-		return null;
+		return wrapperDto;
 	}
 
 	private static final BiFunction<SearchCandidateDto, List<Object>, String> get_candidates_count = (
 			searchCandidateDto, params) -> {
 
 		StringBuilder sb = new StringBuilder();
+
+		sb.append(
+				" select count(*) from candidates candidate left join user created_user on created_user.id = candidate.created_user "
+						+ "left join course course_candidate on course_candidate.candidate_id = candidate.id where 1 = 1 ");
+
+		if (searchCandidateDto.getLoggedUserId() != 1) {
+			sb.append("and candidate.created_username = ? ");
+			params.add(searchCandidateDto.getLoggedUserName());
+		}
+
+		String parameters = null;
+		parameters = search_candidate_parameters.apply(searchCandidateDto, params);
+
+		if (Objects.nonNull(parameters) && !parameters.isEmpty()) {
+			sb.append(parameters);
+		}
 
 		return sb.toString();
 	};

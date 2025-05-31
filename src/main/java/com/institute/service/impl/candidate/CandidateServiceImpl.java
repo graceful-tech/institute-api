@@ -15,6 +15,7 @@ import com.institute.dto.WrapperDto;
 import com.institute.dto.candidate.CandidateDto;
 import com.institute.dto.candidate.SearchCandidateDto;
 import com.institute.entity.candidate.CandidateEntity;
+import com.institute.exception.InstituteException;
 import com.institute.repository.candidate.CandidateCustomRepository;
 import com.institute.repository.candidate.CandidateRepository;
 import com.institute.service.candidate.CandidateService;
@@ -43,24 +44,20 @@ public class CandidateServiceImpl implements CandidateService {
 		Long id = null;
 
 		try {
-			candidateEntity = candidatesRepository.getCandidateDetailsByMobileNumber(candiateDto.getMobileNumber());
+			Candidate = candidatesRepository.getCandidateDetailsByMobileNumber(candiateDto.getMobileNumber());
 
-			if (Objects.nonNull(candidateEntity)) {
-
+			if (Objects.isNull(Candidate)) {
+				if (Objects.nonNull(candiateDto.getName())) {
+					candiateDto.setName(candiateDto.getName().replaceAll("\\s{2,}", " "));
+				}
 				candidateEntity = modelMapper.map(candiateDto, CandidateEntity.class);
+
 				candidateEntity.setId(candidateEntity.getId());
 				candidateEntity.setModifiedDate(LocalDateTime.now());
 				candidateEntity.setModifiedUser(candiateDto.getCreatedUser());
 				candidateEntity.setCreatedUserName(username);
-
-				saveCandidate = candidatesRepository.save(candidateEntity);
-
-				id = saveCandidate.getId();
-			} else {
-				candidateEntity = modelMapper.map(candiateDto, CandidateEntity.class);
 				candidateEntity.setCreatedDate(LocalDateTime.now());
 				candidateEntity.setCreatedUser(candiateDto.getCreatedUser());
-				candidateEntity.setCreatedUserName(username);
 
 				saveCandidate = candidatesRepository.save(candidateEntity);
 
@@ -104,6 +101,7 @@ public class CandidateServiceImpl implements CandidateService {
 
 		WrapperDto<SearchCandidateDto> candidateWrapperDto = null;
 		try {
+			SearchCandidateDto.setLoggedUserName(userName);
 			Pageable pageable = PageRequest.of(SearchCandidateDto.getPage(), SearchCandidateDto.getLimit());
 			candidateWrapperDto = candidateCustomRepository.searchCandidate(SearchCandidateDto, pageable);
 		} catch (Exception e) {
@@ -111,6 +109,72 @@ public class CandidateServiceImpl implements CandidateService {
 		}
 		logger.debug("Service :: shareSearchCandidates :: Exited");
 		return candidateWrapperDto;
+	}
+
+	@Override
+	public Long UpdateCandidate(CandidateDto candiateDto, String username) {
+		logger.debug("Service :: createCandidate :: Entered");
+
+		CandidateEntity candidateEntity = null;
+		CandidateEntity saveCandidate = null;
+		Long id = null;
+
+		try {
+			candidateEntity = candidatesRepository.getCandidateDetailsByMobileNumber(candiateDto.getMobileNumber());
+
+			if (Objects.nonNull(candidateEntity)) {
+
+				candidateEntity = modelMapper.map(candiateDto, CandidateEntity.class);
+				candidateEntity.setId(candidateEntity.getId());
+				candidateEntity.setModifiedDate(LocalDateTime.now());
+				candidateEntity.setModifiedUser(candiateDto.getCreatedUser());
+				candidateEntity.setCreatedUserName(username);
+
+				saveCandidate = candidatesRepository.save(candidateEntity);
+
+				id = saveCandidate.getId();
+			} else {
+				CandidateEntity candidate = new CandidateEntity();
+				candidate = modelMapper.map(candiateDto, CandidateEntity.class);
+				candidate.setCreatedDate(LocalDateTime.now());
+				candidate.setCreatedUser(candiateDto.getCreatedUser());
+				candidate.setCreatedUserName(username);
+
+				saveCandidate = candidatesRepository.save(candidate);
+
+				id = saveCandidate.getId();
+
+				candidate = null;
+			}
+			candidateEntity = null;
+			saveCandidate = null;
+		} catch (Exception e) {
+			logger.error("Service :: createCandidate :: Exception :: " + e.getMessage());
+		}
+		logger.debug("Service :: createCandidate :: Exited");
+		return id;
+
+	}
+
+	@Override
+	public boolean getCandidateDetailsByMobileNumber(CandidateDto candiateDto) {
+		logger.debug("Service :: getCandidateById :: Entered");
+		
+		boolean status = false;
+		CandidateEntity candidateDetailsByMobileNumber = null;
+		try {
+			candidateDetailsByMobileNumber = candidatesRepository
+					.getCandidateDetailsByMobileNumber(candiateDto.getMobileNumber());
+			if (Objects.nonNull(candidateDetailsByMobileNumber)) {
+				status = true;
+			}
+			candidateDetailsByMobileNumber = null;
+
+		} catch (Exception e) {
+			logger.error("Service :: getCandidateById :: Exception :: " + e.getMessage());
+		}
+		logger.debug("Service :: getCandidateById :: Exited");
+		return status;
 	}
 
 }

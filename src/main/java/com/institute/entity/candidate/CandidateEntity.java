@@ -10,7 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "candidate")
+@Table(name = "candidates")
 public class CandidateEntity extends BaseEntity {
 
 	@Id

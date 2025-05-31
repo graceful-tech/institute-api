@@ -1,4 +1,4 @@
-package com.institute.repository.user;
+package com.institute.service;
 
 import java.util.List;
 

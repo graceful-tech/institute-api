@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 import com.institute.dto.ValueSetDto;
 import com.institute.entity.common.ValueSetEntity;
 import com.institute.repository.common.ValueSetRepository;
-import com.institute.repository.user.ValueSetService;
- 
+import com.institute.service.ValueSetService;
+  
 @Service
 public class ValueSetServiceImpl implements ValueSetService {
 
