@@ -18,7 +18,5 @@ public interface ValueSetRepository extends JpaRepository<ValueSetEntity, Long> 
 	@Query(value = "select * from value_sets where value_set_code = :valueSetCode", nativeQuery = true)
 	List<ValueSetEntity> getValueSetsByCode(@Param("valueSetCode") String valueSetCode);
 
-	@Query(value = "select * from user", nativeQuery = true)
-	List<UserEntity> getAllUsers();
 
 }

@@ -26,14 +26,6 @@ public class ValueSetController {
 	@Autowired
 	ValueSetService valueSetService;
 
-	@GetMapping
-	public ResponseEntity<?> getUsers() {
-		logger.debug("Controller :: getValueSetsByCode :: Entered");
-		List<UserDto> allUsers = valueSetService.getAllUsers();
-		logger.debug("Controller :: getValueSetsByCode :: Exited");
-		return new ResponseEntity<>(allUsers, HttpStatus.OK);
-	}
-
 	@PostMapping("/search-by-code")
 	public ResponseEntity<?> getValueSetsByCode(@RequestBody ValueSetDto valueSetDto) {
 		logger.debug("Controller :: getValueSetsByCode :: Entered");

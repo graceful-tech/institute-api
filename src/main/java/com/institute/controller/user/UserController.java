@@ -1,5 +1,7 @@
 package com.institute.controller.user;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,16 @@ public class UserController extends BaseController {
 	@Autowired
 	UserService userService;
 
+	@GetMapping
+	public ResponseEntity<?> getUsers() {
+		logger.debug("Controller :: getValueSetsByCode :: Entered");
+		List<UserDto> allUsers = userService.getAllUsers();
+		logger.debug("Controller :: getValueSetsByCode :: Exited");
+		return new ResponseEntity<>(allUsers, HttpStatus.OK);
+	}
+	
+	
+	
 	@PostMapping("/create")
 	public ResponseEntity<?> createUser(@RequestBody UserDto userDto) {
 		logger.debug("UserController :: createUser :: Entered");

@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.institute.dto.ValueSetDto;
-import com.institute.dto.user.UserDto;
 import com.institute.entity.common.ValueSetEntity;
 import com.institute.repository.common.ValueSetRepository;
 import com.institute.service.ValueSetService;
@@ -46,20 +45,4 @@ public class ValueSetServiceImpl implements ValueSetService {
 		return valueSets;
 	}
 
-	@Override
-	public List<UserDto> getAllUsers() {
-		logger.debug("Service :: getValueSetsByCode :: Entered");
-		List<UserDto> allUser = new ArrayList<>();
-		try {
-			valueSetRepository.getAllUsers().forEach(entity -> {
-				allUser.add(modelMapper.map(entity, UserDto.class));
-			});
-
-		} catch (Exception e) {
-			logger.error("Service :: getValueSetsByCode :: Exception :: " + e.getMessage());
-		}
-
-		logger.debug("Service :: getValueSetsByCode :: Exited");
-		return allUser;
-	}
 }

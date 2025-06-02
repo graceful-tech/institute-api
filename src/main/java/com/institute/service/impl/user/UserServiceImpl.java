@@ -1,7 +1,10 @@
 package com.institute.service.impl.user;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	CommonUtils passwordEncoder;
+	
+	@Autowired
+	ModelMapper modelMapper;
 
 	@Autowired
 	UserRepositoryCustom userRepositoryCustom;
@@ -157,6 +163,23 @@ public class UserServiceImpl implements UserService {
 		}
 		logger.debug("Service :: searchUsers :: Exited");
 		return wrapperDto;
+	}
+
+	@Override
+	public List<UserDto> getAllUsers() {
+		logger.debug("Service :: getValueSetsByCode :: Entered");
+		List<UserDto> allUser = new ArrayList<>();
+		try {
+			userRepository.findAll().forEach(entity -> {
+				allUser.add(modelMapper.map(entity, UserDto.class));
+			});
+
+		} catch (Exception e) {
+			logger.error("Service :: getValueSetsByCode :: Exception :: " + e.getMessage());
+		}
+
+		logger.debug("Service :: getValueSetsByCode :: Exited");
+		return allUser;
 	}
 
 	public UserDto convertUserEntityToUserDto(UserEntity userEntity) {

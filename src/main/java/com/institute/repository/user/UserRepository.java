@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.institute.dto.user.UserDto;
 import com.institute.entity.user.UserEntity;
 
 import jakarta.transaction.Transactional;
@@ -21,7 +22,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
 	@Query(value = "select * from user where mobile_number = :mobileNumber ", nativeQuery = true)
 	UserEntity findByMobileNumber(@Param("mobileNumber") String mobileNumber);
-	
+
 	@Query(value = "select * from user where user_name = :userName ", nativeQuery = true)
 	UserEntity getUserByUserName(@Param("userName") String userName);
 
