@@ -7,14 +7,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.institute.dto.ValueSetDto;
+import com.institute.dto.user.UserDto;
 import com.institute.service.ValueSetService;
- 
+
 @RestController
 @RequestMapping("/value-sets")
 public class ValueSetController {
@@ -23,6 +25,14 @@ public class ValueSetController {
 
 	@Autowired
 	ValueSetService valueSetService;
+
+	@GetMapping
+	public ResponseEntity<?> getUsers() {
+		logger.debug("Controller :: getValueSetsByCode :: Entered");
+		List<UserDto> allUsers = valueSetService.getAllUsers();
+		logger.debug("Controller :: getValueSetsByCode :: Exited");
+		return new ResponseEntity<>(allUsers, HttpStatus.OK);
+	}
 
 	@PostMapping("/search-by-code")
 	public ResponseEntity<?> getValueSetsByCode(@RequestBody ValueSetDto valueSetDto) {

@@ -19,4 +19,23 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 	@Query(value = "select id from users where user_name = :userName", nativeQuery = true)
 	Long getUserId(@Param("userName") String userName);
 
+	@Query(value = "select * from user where mobile_number = :mobileNumber ", nativeQuery = true)
+	UserEntity findByMobileNumber(@Param("mobileNumber") String mobileNumber);
+	
+	@Query(value = "select * from user where user_name = :userName ", nativeQuery = true)
+	UserEntity getUserByUserName(@Param("userName") String userName);
+
+	@Query(value = "select count(*) from user where mobile_number = :mobileNumber or email = :email", nativeQuery = true)
+	int getDuplicateUserCount(@Param("mobileNumber") String mobileNumber, @Param("email") String email);
+
+	@Query(value = "select count(*) from user where id != :userId and (mobile_number = :mobileNumber or email = :email)", nativeQuery = true)
+	int getDuplicateUserCount(@Param("mobileNumber") String mobileNumber, @Param("email") String email,
+			@Param("userId") Long userId);
+
+	@Query(value = "select count(*) from user where user_name = :userName", nativeQuery = true)
+	int getDuplicateUserNameCount(@Param("userName") String userName);
+
+	@Query(value = "select count(*) from users where id != :userId and user_name = :userName", nativeQuery = true)
+	int getDuplicateUserNameCount(@Param("userName") String userName, @Param("userId") Long userId);
+
 }

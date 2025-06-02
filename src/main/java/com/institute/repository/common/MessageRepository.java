@@ -13,7 +13,7 @@ import jakarta.transaction.Transactional;
 @Transactional
 public interface MessageRepository extends JpaRepository<MessageEntity, Long> {
 
-	@Query(value = "select * from make_profile.message where code = :code", nativeQuery = true)
+	@Query(value = "select * from message where code = :code", nativeQuery = true)
 	MessageEntity getMessageByCode(@Param("code") String code);
 
 }

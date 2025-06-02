@@ -1,18 +1,24 @@
 package com.institute.dto.user;
 
-public class UserDto {
-	
+import com.institute.dto.BaseDto;
+
+public class UserDto extends BaseDto {
+
 	private Long id;
-	
+
 	private String name;
-	
+
 	private String email;
-	
+
 	private String mobileNumber;
-	
+
 	private String userName;
-	
+
 	private String password;
+
+	private Long signedRoleId;
+
+	private String search;
 
 	public Long getId() {
 		return id;
@@ -61,5 +67,21 @@ public class UserDto {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
+	public Long getSignedRoleId() {
+		return signedRoleId;
+	}
+
+	public void setSignedRoleId(Long signedRoleId) {
+		this.signedRoleId = signedRoleId;
+	}
+
+	public String getSearch() {
+		return search;
+	}
+
+	public void setSearch(String search) {
+		this.search = search;
+	}
+
 }
