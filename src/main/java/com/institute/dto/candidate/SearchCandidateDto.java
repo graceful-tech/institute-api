@@ -44,6 +44,12 @@ public class SearchCandidateDto extends BaseDto {
 
 	private String modifiedUserName;
 
+	private double courseFees;
+
+	private double amountPaid;
+
+	private double balanceAmount;
+
 	public Long getId() {
 		return id;
 	}
@@ -194,6 +200,30 @@ public class SearchCandidateDto extends BaseDto {
 
 	public void setModifiedUserName(String modifiedUserName) {
 		this.modifiedUserName = modifiedUserName;
+	}
+
+	public double getCourseFees() {
+		return courseFees;
+	}
+
+	public void setCourseFees(double courseFees) {
+		this.courseFees = courseFees;
+	}
+
+	public double getAmountPaid() {
+		return amountPaid;
+	}
+
+	public void setAmountPaid(double amountPaid) {
+		this.amountPaid = amountPaid;
+	}
+
+	public double getBalanceAmount() {
+		return balanceAmount;
+	}
+
+	public void setBalanceAmount(double balanceAmount) {
+		this.balanceAmount = balanceAmount;
 	}
 
 }

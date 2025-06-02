@@ -18,6 +18,7 @@ import com.institute.entity.candidate.CandidateEntity;
 import com.institute.exception.InstituteException;
 import com.institute.repository.candidate.CandidateCustomRepository;
 import com.institute.repository.candidate.CandidateRepository;
+import com.institute.repository.user.UserRepository;
 import com.institute.service.candidate.CandidateService;
 
 @Service
@@ -34,6 +35,9 @@ public class CandidateServiceImpl implements CandidateService {
 	@Autowired
 	CandidateCustomRepository candidateCustomRepository;
 
+	@Autowired
+	UserRepository userRepository;
+
 	@Override
 	public Long createCandidate(CandidateDto candiateDto, String username) {
 		logger.debug("Service :: createCandidate :: Entered");
@@ -44,6 +48,9 @@ public class CandidateServiceImpl implements CandidateService {
 		Long id = null;
 
 		try {
+
+			Long userId = userRepository.getUserId(username);
+
 			Candidate = candidatesRepository.getCandidateDetailsByMobileNumber(candiateDto.getMobileNumber());
 
 			if (Objects.isNull(Candidate)) {
@@ -54,10 +61,10 @@ public class CandidateServiceImpl implements CandidateService {
 
 				candidateEntity.setId(candidateEntity.getId());
 				candidateEntity.setModifiedDate(LocalDateTime.now());
-				candidateEntity.setModifiedUser(candiateDto.getCreatedUser());
+				candidateEntity.setModifiedUser(userId);
 				candidateEntity.setCreatedUserName(username);
 				candidateEntity.setCreatedDate(LocalDateTime.now());
-				candidateEntity.setCreatedUser(candiateDto.getCreatedUser());
+				candidateEntity.setCreatedUser(userId);
 
 				saveCandidate = candidatesRepository.save(candidateEntity);
 
@@ -66,6 +73,7 @@ public class CandidateServiceImpl implements CandidateService {
 			candidateEntity = null;
 			saveCandidate = null;
 			Candidate = null;
+			userId = null;
 		} catch (Exception e) {
 			logger.error("Service :: createCandidate :: Exception :: " + e.getMessage());
 		}
@@ -120,6 +128,8 @@ public class CandidateServiceImpl implements CandidateService {
 		Long id = null;
 
 		try {
+			Long userId = userRepository.getUserId(username);
+
 			candidateEntity = candidatesRepository.getCandidateDetailsByMobileNumber(candiateDto.getMobileNumber());
 
 			if (Objects.nonNull(candidateEntity)) {
@@ -127,7 +137,7 @@ public class CandidateServiceImpl implements CandidateService {
 				candidateEntity = modelMapper.map(candiateDto, CandidateEntity.class);
 				candidateEntity.setId(candidateEntity.getId());
 				candidateEntity.setModifiedDate(LocalDateTime.now());
-				candidateEntity.setModifiedUser(candiateDto.getCreatedUser());
+				candidateEntity.setModifiedUser(userId);
 				candidateEntity.setCreatedUserName(username);
 
 				saveCandidate = candidatesRepository.save(candidateEntity);
@@ -137,7 +147,9 @@ public class CandidateServiceImpl implements CandidateService {
 				CandidateEntity candidate = new CandidateEntity();
 				candidate = modelMapper.map(candiateDto, CandidateEntity.class);
 				candidate.setCreatedDate(LocalDateTime.now());
-				candidate.setCreatedUser(candiateDto.getCreatedUser());
+				candidate.setCreatedUser(userId);
+				candidate.setModifiedUser(userId);
+				candidate.setModifiedDate(LocalDateTime.now());
 				candidate.setCreatedUserName(username);
 
 				saveCandidate = candidatesRepository.save(candidate);
@@ -148,6 +160,7 @@ public class CandidateServiceImpl implements CandidateService {
 			}
 			candidateEntity = null;
 			saveCandidate = null;
+			userId = null;
 		} catch (Exception e) {
 			logger.error("Service :: createCandidate :: Exception :: " + e.getMessage());
 		}
@@ -159,7 +172,7 @@ public class CandidateServiceImpl implements CandidateService {
 	@Override
 	public boolean getCandidateDetailsByMobileNumber(CandidateDto candiateDto) {
 		logger.debug("Service :: getCandidateById :: Entered");
-		
+
 		boolean status = false;
 		CandidateEntity candidateDetailsByMobileNumber = null;
 		try {

@@ -34,20 +34,23 @@ public class UserController extends BaseController {
 	@GetMapping
 	public ResponseEntity<?> getUsers() {
 		logger.debug("Controller :: getValueSetsByCode :: Entered");
+		
 		List<UserDto> allUsers = userService.getAllUsers();
+		
 		logger.debug("Controller :: getValueSetsByCode :: Exited");
+		
 		return new ResponseEntity<>(allUsers, HttpStatus.OK);
 	}
-	
-	
 	
 	@PostMapping("/create")
 	public ResponseEntity<?> createUser(@RequestBody UserDto userDto) {
 		logger.debug("UserController :: createUser :: Entered");
+		
 		boolean user = false;
 		user = userService.createUser(userDto);
 
 		logger.debug("UserController :: createUser :: Exited");
+		
 		if (!user) {
 			logger.debug("UserController :: createUser :: Error");
 			 return new ResponseEntity<>(buildResponse(CommonConstants.I_0003), HttpStatus.BAD_REQUEST);
@@ -63,16 +66,19 @@ public class UserController extends BaseController {
 		UserDto userDto = userService.getUserById(id);
 		
 		logger.debug("UserController :: getUser :: Exited");
+		
 		return new ResponseEntity<>(userDto, HttpStatus.OK);
 	}
 	
 	@PutMapping("/update/{id}")
 	public ResponseEntity<?> updateUser(@RequestBody UserDto userDto,@PathVariable Long id ) {
 		logger.debug("UserController :: updateUser :: Entered");
+		
 		boolean user = false;
 		user = userService.updateUser(userDto,id);
 
 		logger.debug("UserController :: updateUser :: Exited");
+		
 		if (!user) {
 			logger.debug("UserController :: updateUser :: Error");
 			return new ResponseEntity<>(buildResponse(CommonConstants.I_0003), HttpStatus.BAD_REQUEST);
@@ -90,6 +96,7 @@ public class UserController extends BaseController {
 		 WrapperDto<UserDto> searchUsers = userService.searchUsers(searchUserDto, userName);
 
 		logger.debug("Controller :: searchUsers :: Exited");
+		
 		return new ResponseEntity<>(searchUsers, HttpStatus.OK);
 	}
 

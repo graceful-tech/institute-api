@@ -28,14 +28,9 @@ public class CourseController {
 
 	@PostMapping("/create")
 	public ResponseEntity<?> createCource(@RequestBody CourseDto courseDto, @RequestHeader("username") String username,
-			@RequestHeader("userid") Long userid
-
-	) {
+			@RequestHeader("userid") Long userid) {
 		logger.debug("Controller :: createCource :: Entered");
 
-		if (userid != null) {
-			courseDto.setCreatedUser(Long.valueOf(userid));
-		}
 		Long id = courseService.createCourse(courseDto, username);
 
 		logger.debug("Controller :: createCource :: Exited");

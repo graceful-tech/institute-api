@@ -35,12 +35,8 @@ public class CandidateController extends BaseController {
 
 	@PostMapping("/create")
 	public ResponseEntity<?> createCandidate(@RequestBody CandidateDto candidateDto,
-			@RequestHeader("username") String username, @RequestHeader("userid") Long userid) {
+			@RequestHeader("username") String username) {
 		logger.debug("Controller :: createCandidate :: Entered");
-
-		if (userid != null) {
-			candidateDto.setCreatedUser(Long.valueOf(userid));
-		}
 
 		Long id = candidateService.createCandidate(candidateDto, username);
 

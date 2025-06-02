@@ -50,11 +50,6 @@ public class CandidateCustomRepositoryImpl implements CandidateCustomRepository 
 			params.add(CommonUtils.appendLikeOperator(searchCandidateDto.getSearch()));
 		}
 
-		if (Objects.nonNull(searchCandidateDto.getUserName()) && !searchCandidateDto.getUserName().isEmpty()) {
-			sb.append(" and course_candidate.created_username = ? ");
-			params.add(searchCandidateDto.getUserName());
-		}
-
 		if (Objects.nonNull(searchCandidateDto.getBatchName()) && !searchCandidateDto.getBatchName().isEmpty()) {
 			sb.append(" and course_candidate.batch_name = ? ");
 			params.add(searchCandidateDto.getBatchName());
@@ -82,9 +77,13 @@ public class CandidateCustomRepositoryImpl implements CandidateCustomRepository 
 		sb.append(
 				" select candidate.id, candidate.name, candidate.mobile_number, candidate.email, candidate.qualification ,candidate.location ,candidate.created_username, "
 						+ "candidate.created_date, candidate.modified_date, course_candidate.mode, "
-						+ "course_candidate.batch_preference , course_candidate.batch_name, course_candidate.status "
-						+ "from candidates candidate left join user created_user on created_user.id = candidate.created_user  "
-						+ "left join course course_candidate on course_candidate.candidate_id = candidate.id where 1 = 1 ");
+						+ "course_candidate.batch_preference , course_candidate.batch_name, course_candidate.status,modified_user.user_name as modified_user ,course_candidate.course_name, "
+						+ "payments.course_fees ,payments.amount_paid ,payments.balance_amount "
+						+ "from candidates candidate "
+						+ "left join user created_user on created_user.id = candidate.created_user  "
+						+ "left join course course_candidate on course_candidate.candidate_id = candidate.id "
+						+ "left join payment payments on payments.candidate_id = candidate.id "
+						+ "left join user modified_user on modified_user.id=candidate.modified_user where 1 = 1 ");
 
 		if (searchCandidateDto.getLoggedUserId() != 1) {
 			sb.append("and candidate.created_username = ? ");
@@ -109,7 +108,6 @@ public class CandidateCustomRepositoryImpl implements CandidateCustomRepository 
 		WrapperDto<SearchCandidateDto> wrapperDto = new WrapperDto<>();
 		List<SearchCandidateDto> candidateList = new ArrayList<>();
 		WeakReference<List<SearchCandidateDto>> weakListRef = new WeakReference<>(candidateList);
-
 
 		try {
 
@@ -152,19 +150,34 @@ public class CandidateCustomRepositoryImpl implements CandidateCustomRepository 
 				searchCandidate.setBatchPreference((String) result[10]);
 				searchCandidate.setBatchName((String) result[11]);
 				searchCandidate.setStatus((String) result[12]);
+				searchCandidate.setModifiedUserName((String) result[13]);
+				searchCandidate.setCourseName((String) result[14]);
 				
+				 
+						
+				if (Objects.nonNull(result[15])) {
+				    searchCandidate.setCourseFees(((Number) result[15]).doubleValue());
+				}
+
+				if (Objects.nonNull(result[16])) {
+				    searchCandidate.setAmountPaid(((Number) result[16]).doubleValue());
+				}
+
+				if (Objects.nonNull(result[17])) {
+				    searchCandidate.setBalanceAmount(((Number) result[17]).doubleValue());
+				}
+
 
 				weakListRef.get().add(searchCandidate);
-				
+
 				searchCandidate = null;
 
 			});
-			
+
 			wrapperDto.setResults(weakListRef.get());
 			wrapperDto.setTotalRecords(getSearchCandidateCount(searchCandidateDto));
 
 			candidateList = null;
-
 
 		} catch (Exception e) {
 			logger.error("Repository :: searchCandidate :: Exception :: " + e.getMessage());

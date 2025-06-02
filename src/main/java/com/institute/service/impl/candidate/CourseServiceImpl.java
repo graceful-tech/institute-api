@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.institute.dto.candidate.CourseDto;
 import com.institute.entity.candidate.CourseEntity;
 import com.institute.repository.candidate.CourseRepository;
+import com.institute.repository.user.UserRepository;
 import com.institute.service.candidate.CourseService;
 
 @Service
@@ -25,6 +26,9 @@ public class CourseServiceImpl implements CourseService {
 	@Autowired
 	ModelMapper modelMapper;
 
+	@Autowired
+	UserRepository userRepository;
+
 	@Override
 	public Long createCourse(CourseDto courseDto, String username) {
 		logger.debug("Service :: createCourse :: Entered");
@@ -35,12 +39,13 @@ public class CourseServiceImpl implements CourseService {
 		Long id = null;
 
 		try {
+
 			courseEntity = courseRepository.getCourseByCandidateId(courseDto.getCandidateId());
 
 			if (Objects.nonNull(courseEntity)) {
 				course = modelMapper.map(courseDto, CourseEntity.class);
 				course.setModifiedDate(LocalDateTime.now());
-				course.setModifiedUser(courseDto.getCreatedUser());
+				course.setModifiedUser(userRepository.getUserId(username));
 				course.setCandidateId(courseDto.getCandidateId());
 
 				saveCourseEntity = courseRepository.save(course);
@@ -50,6 +55,8 @@ public class CourseServiceImpl implements CourseService {
 				course = modelMapper.map(courseDto, CourseEntity.class);
 				course.setCreatedUserName(username);
 				course.setCreatedDate(LocalDateTime.now());
+				course.setModifiedDate(LocalDateTime.now());
+				course.setModifiedUser(userRepository.getUserId(username));
 
 				saveCourseEntity = courseRepository.save(course);
 
