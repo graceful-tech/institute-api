@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 
 import com.institute.dto.WrapperDto;
 import com.institute.dto.user.UserDto;
-import com.institute.entity.user.UserEntity;
 import com.institute.repository.user.UserRepositoryCustom;
 import com.institute.utility.CommonUtils;
 
@@ -48,7 +47,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public WrapperDto<UserDto> searchUsers(UserDto searchUserDto, UserEntity userEntity, Pageable pageable) {
+	public WrapperDto<UserDto> searchUsers(UserDto searchUserDto, Pageable pageable) {
 		logger.debug("Repository :: searchUsers :: Entered");
 		WrapperDto<UserDto> wrapperDto = new WrapperDto<>();
 		List<UserDto> users = new ArrayList<>();

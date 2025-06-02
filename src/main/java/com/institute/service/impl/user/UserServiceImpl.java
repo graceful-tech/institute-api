@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	CommonUtils passwordEncoder;
-	
+
 	@Autowired
 	ModelMapper modelMapper;
 
@@ -150,14 +150,15 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public WrapperDto<UserDto> searchUsers(UserDto searchUserDto, String userName) {
+	public WrapperDto<UserDto> searchUsers(UserDto userDto, String userName) {
 		logger.debug("Service :: searchUsers :: Entered");
 		WrapperDto<UserDto> wrapperDto = null;
 		try {
-			UserEntity userEntity = userRepository.getUserByUserName(userName);
+			userDto.setSignedUserId(userRepository.getUserId(userName));
+			userDto.setUserName(userName);
 
-			Pageable pageable = PageRequest.of(searchUserDto.getPage(), searchUserDto.getLimit());
-			wrapperDto = userRepositoryCustom.searchUsers(searchUserDto, userEntity, pageable);
+			Pageable pageable = PageRequest.of(userDto.getPage(), userDto.getLimit());
+			wrapperDto = userRepositoryCustom.searchUsers(userDto, pageable);
 		} catch (Exception e) {
 			logger.error("Service :: searchUsers :: Exception :: " + e.getMessage());
 		}

@@ -12,7 +12,7 @@ import com.institute.entity.user.UserEntity;
 
 public interface UserRepositoryCustom {
 	
-	WrapperDto<UserDto> searchUsers(UserDto searchUserDto, UserEntity userEntity, Pageable pageable);
+	WrapperDto<UserDto> searchUsers(UserDto searchUserDto,Pageable pageable);
 
 //	List<SearchUserDto> getAvailableUsers(TeamDto teamDto);
 

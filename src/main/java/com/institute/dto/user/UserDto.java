@@ -16,7 +16,7 @@ public class UserDto extends BaseDto {
 
 	private String password;
 
-	private Long signedRoleId;
+	private Long signedUserId;
 
 	private String search;
 
@@ -68,14 +68,6 @@ public class UserDto extends BaseDto {
 		this.password = password;
 	}
 
-	public Long getSignedRoleId() {
-		return signedRoleId;
-	}
-
-	public void setSignedRoleId(Long signedRoleId) {
-		this.signedRoleId = signedRoleId;
-	}
-
 	public String getSearch() {
 		return search;
 	}
@@ -84,4 +76,12 @@ public class UserDto extends BaseDto {
 		this.search = search;
 	}
 
+	public Long getSignedUserId() {
+		return signedUserId;
+	}
+
+	public void setSignedUserId(Long signedUserId) {
+		this.signedUserId = signedUserId;
+	}
+	
 }
