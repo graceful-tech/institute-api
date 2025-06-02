@@ -55,6 +55,11 @@ public class CandidateCustomRepositoryImpl implements CandidateCustomRepository 
 			params.add(searchCandidateDto.getBatchName());
 		}
 
+		if (Objects.nonNull(searchCandidateDto.getUserName()) && !searchCandidateDto.getUserName().isEmpty()) {
+			sb.append(" and candidate.created_username = ? ");
+			params.add(searchCandidateDto.getUserName());
+		}
+
 		if (Objects.nonNull(searchCandidateDto.getBatchPreference())
 				&& !searchCandidateDto.getBatchPreference().isEmpty()) {
 			sb.append(" and course_candidate.batch_preference = ? ");
@@ -152,21 +157,18 @@ public class CandidateCustomRepositoryImpl implements CandidateCustomRepository 
 				searchCandidate.setStatus((String) result[12]);
 				searchCandidate.setModifiedUserName((String) result[13]);
 				searchCandidate.setCourseName((String) result[14]);
-				
-				 
-						
+
 				if (Objects.nonNull(result[15])) {
-				    searchCandidate.setCourseFees(((Number) result[15]).doubleValue());
+					searchCandidate.setCourseFees(((Number) result[15]).doubleValue());
 				}
 
 				if (Objects.nonNull(result[16])) {
-				    searchCandidate.setAmountPaid(((Number) result[16]).doubleValue());
+					searchCandidate.setAmountPaid(((Number) result[16]).doubleValue());
 				}
 
 				if (Objects.nonNull(result[17])) {
-				    searchCandidate.setBalanceAmount(((Number) result[17]).doubleValue());
+					searchCandidate.setBalanceAmount(((Number) result[17]).doubleValue());
 				}
-
 
 				weakListRef.get().add(searchCandidate);
 
