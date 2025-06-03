@@ -89,7 +89,7 @@ public class CandidateCustomRepositoryImpl implements CandidateCustomRepository 
 				" select candidate.id, candidate.name, candidate.mobile_number, candidate.email, candidate.qualification ,candidate.location ,candidate.created_username, "
 						+ "candidate.created_date, candidate.modified_date, course_candidate.mode, "
 						+ "course_candidate.batch_preference , course_candidate.batch_name, course_candidate.status,modified_user.user_name as modified_user ,course_candidate.course_name, "
-						+ "payments.course_fees ,payments.amount_paid ,payments.balance_amount "
+						+ "payments.course_fees ,payments.amount_paid ,payments.discount,payments.balance_amount  "
 						+ "from candidates candidate "
 						+ "left join user created_user on created_user.id = candidate.created_user  "
 						+ "left join course course_candidate on course_candidate.candidate_id = candidate.id "
@@ -166,17 +166,12 @@ public class CandidateCustomRepositoryImpl implements CandidateCustomRepository 
 				searchCandidate.setModifiedUserName((String) result[13]);
 				searchCandidate.setCourseName((String) result[14]);
 
-				if (Objects.nonNull(result[15])) {
-					searchCandidate.setCourseFees(((Number) result[15]).doubleValue());
-				}
+				
+				searchCandidate.setCourseFees(result[15] != null ? ((Number) result[15]).doubleValue() : 0.0);
+				searchCandidate.setAmountPaid(result[16] != null ? ((Number) result[16]).doubleValue() : 0.0);
+				searchCandidate.setDiscount(result[17] != null ? ((Number) result[17]).doubleValue() : 0.0);
+				searchCandidate.setBalanceAmount(result[18] != null ? ((Number) result[18]).doubleValue() : 0.0);
 
-				if (Objects.nonNull(result[16])) {
-					searchCandidate.setAmountPaid(((Number) result[16]).doubleValue());
-				}
-
-				if (Objects.nonNull(result[17])) {
-					searchCandidate.setBalanceAmount(((Number) result[17]).doubleValue());
-				}
 
 				weakListRef.get().add(searchCandidate);
 

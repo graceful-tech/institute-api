@@ -1,5 +1,7 @@
 package com.institute.controller.payment;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,10 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.institute.dto.WrapperDto;
 import com.institute.dto.payment.PaymentDto;
+import com.institute.dto.payment.PaymentHistoryDto;
+import com.institute.dto.payment.SearchPaymentDto;
 import com.institute.service.payment.PaymentService;
 
 @RestController
@@ -45,6 +50,28 @@ public class PaymentController {
 		logger.debug("Controller :: getPayment :: Exited");
 
 		return new ResponseEntity<>(paymentDto, HttpStatus.OK);
+	}
+
+	@PostMapping("/search")
+	public ResponseEntity<?> searchPayment(@RequestBody SearchPaymentDto searchPaymentDto,
+			@RequestHeader("username") String username) {
+		logger.debug("Controller :: searchPayment :: Entered");
+
+		WrapperDto<SearchPaymentDto> savePayment = paymentService.searchPayment(searchPaymentDto, username);
+
+		logger.debug("Controller :: searchPayment :: Exited");
+		return new ResponseEntity<>(savePayment, HttpStatus.OK);
+	}
+
+	@GetMapping("/history/{id}")
+	public ResponseEntity<?> getPaymentHistory(@PathVariable Long id, @RequestHeader("username") String username) {
+		logger.debug("Controller :: getPayment :: Entered");
+
+		List<PaymentHistoryDto> historyDto = paymentService.getPaymentHistoryBypaymentId(id, username);
+
+		logger.debug("Controller :: getPayment :: Exited");
+
+		return new ResponseEntity<>(historyDto, HttpStatus.OK);
 	}
 
 }

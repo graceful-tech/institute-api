@@ -50,6 +50,14 @@ public class SearchCandidateDto extends BaseDto {
 
 	private double balanceAmount;
 
+	private double discount;
+
+	private String filterType;
+
+	private LocalDate fromDate;
+
+	private LocalDate toDate;
+
 	public Long getId() {
 		return id;
 	}
@@ -224,6 +232,38 @@ public class SearchCandidateDto extends BaseDto {
 
 	public void setBalanceAmount(double balanceAmount) {
 		this.balanceAmount = balanceAmount;
+	}
+
+	public double getDiscount() {
+		return discount;
+	}
+
+	public void setDiscount(double discount) {
+		this.discount = discount;
+	}
+
+	public String getFilterType() {
+		return filterType;
+	}
+
+	public void setFilterType(String filterType) {
+		this.filterType = filterType;
+	}
+
+	public LocalDate getFromDate() {
+		return fromDate;
+	}
+
+	public void setFromDate(LocalDate fromDate) {
+		this.fromDate = fromDate;
+	}
+
+	public LocalDate getToDate() {
+		return toDate;
+	}
+
+	public void setToDate(LocalDate toDate) {
+		this.toDate = toDate;
 	}
 
 }
