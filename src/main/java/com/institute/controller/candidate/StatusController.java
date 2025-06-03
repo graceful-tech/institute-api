@@ -25,11 +25,11 @@ public class StatusController {
 
 	@GetMapping
 	public ResponseEntity<?> getStatus() {
-		logger.debug("Controller :: getValueSetsByCode :: Entered");
+		logger.debug("Controller :: getStatus :: Entered");
 
 		List<StatusDto> valueSets = statusService.getAllStatus();
 
-		logger.debug("Controller :: getValueSetsByCode :: Exited");
+		logger.debug("Controller :: getStatus :: Exited");
 		return new ResponseEntity<>(valueSets, HttpStatus.OK);
 	}
 }

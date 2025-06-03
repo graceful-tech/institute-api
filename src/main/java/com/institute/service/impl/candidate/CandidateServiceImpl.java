@@ -138,7 +138,6 @@ public class CandidateServiceImpl implements CandidateService {
 				candidateEntity.setId(candidateEntity.getId());
 				candidateEntity.setModifiedDate(LocalDateTime.now());
 				candidateEntity.setModifiedUser(userId);
-				candidateEntity.setCreatedUserName(username);
 
 				saveCandidate = candidatesRepository.save(candidateEntity);
 

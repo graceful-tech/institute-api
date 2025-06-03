@@ -70,6 +70,12 @@ public class CandidateCustomRepositoryImpl implements CandidateCustomRepository 
 			sb.append(" and course_candidate.mode = ? ");
 			params.add(searchCandidateDto.getMode());
 		}
+		
+		if (Objects.nonNull(searchCandidateDto.getStatus())
+				&& !searchCandidateDto.getStatus().isEmpty()) {
+			sb.append(" and  course_candidate.status  = ? ");
+			params.add(searchCandidateDto.getStatus());
+		}
 
 		return sb.toString();
 	};
@@ -102,12 +108,14 @@ public class CandidateCustomRepositoryImpl implements CandidateCustomRepository 
 			sb.append(parameters);
 		}
 
+		sb.append(" order by candidate.modified_date desc ");
+		
 		return sb.toString();
 	};
 
 	@Override
 	public WrapperDto<SearchCandidateDto> searchCandidate(SearchCandidateDto searchCandidateDto, Pageable pageable) {
-		logger.error("Repository :: searchCandidate :: Entered");
+		logger.debug("Repository :: searchCandidate :: Entered");
 
 		List<Object> params = new ArrayList<>();
 		WrapperDto<SearchCandidateDto> wrapperDto = new WrapperDto<>();
