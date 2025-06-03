@@ -28,26 +28,29 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 	@PersistenceContext
 	EntityManager entityManager;
 
-	private static final BiFunction<UserDto, List<Object>, String> search_users = (searchUserDto, params) -> {
+	private static final BiFunction<UserDto, List<Object>, String> search_users = (userDto, params) -> {
 		StringBuilder sb = new StringBuilder();
 		sb.append("select user.id, user.name, user.mobile_number, user.email, user.user_name from user as user "
 				+ " where 1 = 1 ");
 
-		if (Objects.nonNull(searchUserDto.getSearch()) && !searchUserDto.getSearch().isEmpty()) {
+		if (Objects.nonNull(userDto.getSearch()) && !userDto.getSearch().isEmpty()) {
 			sb.append(" and (upper(user.name) like upper(?) or upper(user.mobile_number) like upper(?) "
 					+ "or upper(user.email) like upper(?)) or upper(user.user_name) like upper(?) ");
-			params.add(CommonUtils.appendLikeOperator(searchUserDto.getSearch()));
-			params.add(CommonUtils.appendLikeOperator(searchUserDto.getSearch()));
-			params.add(CommonUtils.appendLikeOperator(searchUserDto.getSearch()));
-			params.add(CommonUtils.appendLikeOperator(searchUserDto.getSearch()));
+			params.add(CommonUtils.appendLikeOperator(userDto.getSearch()));
+			params.add(CommonUtils.appendLikeOperator(userDto.getSearch()));
+			params.add(CommonUtils.appendLikeOperator(userDto.getSearch()));
+			params.add(CommonUtils.appendLikeOperator(userDto.getSearch()));
 		}
-
+		if (Objects.nonNull(userDto.getSignedUserId()) && userDto.getSignedUserId() > 1) {
+			sb.append(" AND user.id = ? ");
+			params.add(userDto.getSignedUserId());
+		}
 		return sb.toString();
 	};
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public WrapperDto<UserDto> searchUsers(UserDto searchUserDto, Pageable pageable) {
+	public WrapperDto<UserDto> searchUsers(UserDto userDto, Pageable pageable) {
 		logger.debug("Repository :: searchUsers :: Entered");
 		WrapperDto<UserDto> wrapperDto = new WrapperDto<>();
 		List<UserDto> users = new ArrayList<>();
@@ -55,7 +58,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 		try {
 //			searchUserDto.setSignedUserName(userEntity.getUserName());
 
-			Query query = entityManager.createNativeQuery(search_users.apply(searchUserDto, params));
+			Query query = entityManager.createNativeQuery(search_users.apply(userDto, params));
 
 			int count = 1;
 			for (Object param : params) {
@@ -72,18 +75,15 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 
 				Long userId = (Long) result[0];
 				user.setId(userId);
-
 				user.setName((String) result[1]);
 				user.setMobileNumber((String) result[2]);
 				user.setEmail((String) result[3]);
 				user.setUserName((String) result[4]);
-
 				users.add(user);
 				user = null;
 			});
-
 			wrapperDto.setResults(users);
-			wrapperDto.setTotalRecords(getUsersCount(searchUserDto));
+			wrapperDto.setTotalRecords(getUsersCount(userDto));
 		} catch (Exception e) {
 			logger.error("Repository :: searchUsers :: Exception :: " + e.getMessage());
 		}
@@ -91,21 +91,17 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 		return wrapperDto;
 	}
 
-	private Long getUsersCount(UserDto searchUserDto) {
+	private Long getUsersCount(UserDto userDto) {
 		logger.debug("Repository :: getUsersCount :: Entered");
 		Long totalRecords = null;
 		List<Object> params = new ArrayList<>();
 		try {
-
-			Query query = entityManager.createNativeQuery(get_users_count.apply(searchUserDto, params));
-
+			Query query = entityManager.createNativeQuery(get_users_count.apply(userDto, params));
 			int count = 1;
 			for (Object param : params) {
 				query.setParameter(count++, param);
 			}
-
 			totalRecords = (Long) query.getSingleResult();
-
 		} catch (Exception e) {
 			logger.error("Repository :: getUsersCount :: Exception :: " + e.getMessage());
 		}
@@ -113,17 +109,17 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 		return totalRecords;
 	}
 
-	private static final BiFunction<UserDto, List<Object>, String> get_users_count = (searchUserDto, params) -> {
+	private static final BiFunction<UserDto, List<Object>, String> get_users_count = (userDto, params) -> {
 		StringBuilder sb = new StringBuilder();
 		sb.append("select count(*) from user as user " + " where 1 = 1 ");
 
-		if (Objects.nonNull(searchUserDto.getSearch()) && !searchUserDto.getSearch().isEmpty()) {
+		if (Objects.nonNull(userDto.getSearch()) && !userDto.getSearch().isEmpty()) {
 			sb.append(" and (upper(user.name) like upper(?) or upper(user.mobile_number) like upper(?) "
 					+ "or upper(user.email) like upper(?)) or upper(user.user_name) like upper(?) ");
-			params.add(CommonUtils.appendLikeOperator(searchUserDto.getSearch()));
-			params.add(CommonUtils.appendLikeOperator(searchUserDto.getSearch()));
-			params.add(CommonUtils.appendLikeOperator(searchUserDto.getSearch()));
-			params.add(CommonUtils.appendLikeOperator(searchUserDto.getSearch()));
+			params.add(CommonUtils.appendLikeOperator(userDto.getSearch()));
+			params.add(CommonUtils.appendLikeOperator(userDto.getSearch()));
+			params.add(CommonUtils.appendLikeOperator(userDto.getSearch()));
+			params.add(CommonUtils.appendLikeOperator(userDto.getSearch()));
 		}
 
 		return sb.toString();

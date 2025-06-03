@@ -12,35 +12,31 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.institute.controller.BaseController;
 import com.institute.dto.login.LoginDto;
+import com.institute.dto.user.UserDto;
 import com.institute.service.login.LoginService;
 import com.institute.utility.CommonConstants;
-
-
 
 @RestController
 @RequestMapping("/auth")
 public class LoginController extends BaseController {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
-	
+
 	@Autowired
 	LoginService loginService;
-	
+
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
 		logger.debug("LoginController :: login :: Entered");
-		com.institute.dto.user.UserDto userDto = null;
-		try {
-			userDto = loginService.findByMobileNumber(loginDto);
-			
+		UserDto userDto = null;
 
-			logger.debug("LoginController :: userLogin :: Exited");
+		userDto = loginService.findByMobileNumber(loginDto);
+		logger.debug("LoginController :: userLogin :: Exited");
+		if (userDto != null) {
 			return ResponseEntity.ok(userDto);
-		} catch (Exception e) {
-			logger.debug("LoginController :: userLogin :: Error");
 		}
+		logger.debug("LoginController :: userLogin :: Error");
 		return new ResponseEntity<>(buildResponse(CommonConstants.I_0005), HttpStatus.BAD_REQUEST);
 	}
-
 
 }
