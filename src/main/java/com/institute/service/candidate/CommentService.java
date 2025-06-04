@@ -8,6 +8,6 @@ public interface CommentService {
 	boolean createComment(CommentDto commentDto, String userName);
 
 	WrapperDto<CommentDto> getComments(CommentDto commentDto);
-	
-	WrapperDto<CommentDto> getCommentRemindInDashboard(CommentDto commentDto);
+
+	WrapperDto<CommentDto> getCommentRemindInDashboard(CommentDto commentDto, String username);
 }

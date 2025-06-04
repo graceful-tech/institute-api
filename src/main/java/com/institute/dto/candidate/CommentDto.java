@@ -22,6 +22,8 @@ public class CommentDto extends PageDto {
 
 	private Long signedUserId;
 
+	private Long userId;
+
 	public Long getId() {
 		return id;
 	}
@@ -84,6 +86,14 @@ public class CommentDto extends PageDto {
 
 	public void setSignedUserId(Long signedUserId) {
 		this.signedUserId = signedUserId;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 
 }

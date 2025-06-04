@@ -39,7 +39,8 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public boolean createUser(UserDto userDto) {
-		logger.debug("UserServiceImpl :: createUser :: Entered");
+		logger.debug("Service :: createUser :: Entered");
+
 		boolean status = false;
 		UserEntity makeProfileUserEntity = null;
 		try {
@@ -53,31 +54,35 @@ public class UserServiceImpl implements UserService {
 			makeProfileUserEntity = null;
 		} catch (Exception e) {
 			status = false;
-			logger.debug("UserServiceImpl :: createUser :: Error" + e.getMessage());
+			logger.error("Service :: createUser :: Error" + e.getMessage());
 
 		}
-		logger.debug("UserServiceImpl :: createUser :: Exited");
+		logger.debug("Service :: createUser :: Exited");
 
 		return status;
 	}
 
 	@Override
 	public UserDto getUserById(Long id) {
-		logger.debug("UserServiceImpl :: getUserById :: Entered");
+		logger.debug("Service :: getUserById :: Entered");
+
 		UserDto userDto = new UserDto();
 		try {
+
 			userDto = convertUserEntityToUserDto(userRepository.getById(id));
+
 		} catch (Exception e) {
-			logger.debug("UserServiceImpl :: getUserById :: Error" + e.getMessage());
+			logger.error("Service :: getUserById :: Error" + e.getMessage());
 		}
 
-		logger.debug("UserServiceImpl :: getUserById :: Exited");
+		logger.debug("Service :: getUserById :: Exited");
 		return userDto;
 	}
 
 	@Override
 	public boolean updateUser(UserDto userDto, Long id) {
-		logger.debug("UserServiceImpl :: updateUser :: Entered");
+		logger.debug("Service :: updateUser :: Entered");
+
 		boolean status = false;
 		try {
 
@@ -98,9 +103,9 @@ public class UserServiceImpl implements UserService {
 				status = true;
 			}
 		} catch (Exception e) {
-			logger.error("UserServiceImpl :: updateUser :: Exception :: " + e.getMessage());
+			logger.error("Service :: updateUser :: Exception :: " + e.getMessage());
 		}
-		logger.debug("UserServiceImpl :: updateUser :: Exited");
+		logger.debug("Service :: updateUser :: Exited");
 		return status;
 	}
 
@@ -128,7 +133,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	public boolean validateUserName(UserDto userDto) {
-		logger.debug("UserServiceImpl :: validateUserName :: Entered");
+		logger.debug("Service :: validateUserName :: Entered");
+
 		boolean status = false;
 		try {
 			int count = 0;
@@ -138,21 +144,22 @@ public class UserServiceImpl implements UserService {
 			} else {
 				count = userRepository.getDuplicateUserNameCount(userDto.getUserName());
 			}
-
 			if (count > 0) {
 				status = true;
 			}
 		} catch (Exception e) {
-			logger.error("UserServiceImpl :: validateUserName :: Exception :: " + e.getMessage());
+			logger.error("Service :: validateUserName :: Exception :: " + e.getMessage());
 		}
-		logger.debug("UserServiceImpl :: validateUserName :: Exited");
+		logger.debug("Service :: validateUserName :: Exited");
 		return status;
 	}
 
 	@Override
 	public WrapperDto<UserDto> searchUsers(UserDto userDto, String userName) {
 		logger.debug("Service :: searchUsers :: Entered");
+
 		WrapperDto<UserDto> wrapperDto = null;
+
 		try {
 			userDto.setSignedUserId(userRepository.getUserId(userName));
 			userDto.setUserName(userName);
@@ -162,24 +169,26 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception e) {
 			logger.error("Service :: searchUsers :: Exception :: " + e.getMessage());
 		}
+
 		logger.debug("Service :: searchUsers :: Exited");
 		return wrapperDto;
 	}
 
 	@Override
 	public List<UserDto> getAllUsers() {
-		logger.debug("Service :: getValueSetsByCode :: Entered");
+		logger.debug("Service :: getAllUsers :: Entered");
 		List<UserDto> allUser = new ArrayList<>();
+
 		try {
 			userRepository.findAll().forEach(entity -> {
 				allUser.add(modelMapper.map(entity, UserDto.class));
 			});
 
 		} catch (Exception e) {
-			logger.error("Service :: getValueSetsByCode :: Exception :: " + e.getMessage());
+			logger.error("Service :: getAllUsers :: Exception :: " + e.getMessage());
 		}
 
-		logger.debug("Service :: getValueSetsByCode :: Exited");
+		logger.debug("Service :: getAllUsers :: Exited");
 		return allUser;
 	}
 

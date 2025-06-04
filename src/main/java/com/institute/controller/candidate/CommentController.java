@@ -53,11 +53,10 @@ public class CommentController extends BaseController {
 
 	@PostMapping("/dashboardComment")
 	public ResponseEntity<?> getCommentRemindInDashboard(@RequestBody CommentDto commentDto,
-			@RequestHeader("username") String userName) {
+			@RequestHeader("username") String username) {
 		logger.debug("Controller :: getCommentRemindInDashboard :: Entered");
 
-		commentDto.setSignedUserName(userName);
-		WrapperDto<CommentDto> comments = commentService.getCommentRemindInDashboard(commentDto);
+		WrapperDto<CommentDto> comments = commentService.getCommentRemindInDashboard(commentDto, username);
 
 		logger.debug("Controller :: getCommentRemindInDashboard :: Exited");
 		return new ResponseEntity<>(comments, HttpStatus.OK);

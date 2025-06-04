@@ -76,6 +76,23 @@ public class CandidateCustomRepositoryImpl implements CandidateCustomRepository 
 			sb.append(" and  course_candidate.status  = ? ");
 			params.add(searchCandidateDto.getStatus());
 		}
+		
+		if (Objects.nonNull(searchCandidateDto.getFilterType())) {
+
+			if (searchCandidateDto.getFilterType().equalsIgnoreCase("TODAY")) {
+				sb.append(" and date(candidate.modified_date) = curdate()");
+			} else if (searchCandidateDto.getFilterType().equalsIgnoreCase("THIS WEEK")) {
+				sb.append(" and week(candidate.modified_date) = week(now())");
+			} else if (searchCandidateDto.getFilterType().equalsIgnoreCase("CUSTOM")
+					&& Objects.nonNull(searchCandidateDto.getFromDate())
+					&& Objects.nonNull(searchCandidateDto.getToDate())) {
+				sb.append(
+						" and (date(candidate.modified_date) between str_to_date(?, '%Y-%m-%d') and str_to_date(?, '%Y-%m-%d'))");
+				params.add(searchCandidateDto.getFromDate());
+				params.add(searchCandidateDto.getToDate());
+			}
+
+		}
 
 		return sb.toString();
 	};
@@ -216,7 +233,7 @@ public class CandidateCustomRepositoryImpl implements CandidateCustomRepository 
 	};
 
 	private Long getSearchCandidateCount(SearchCandidateDto searchCandidateDto) {
-		logger.error("Repository :: getSearchCandidateCount :: Entered");
+		logger.debug("Repository :: getSearchCandidateCount :: Entered");
 
 		Long totalRecords = null;
 		List<Object> params = new ArrayList<>();

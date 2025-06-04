@@ -42,7 +42,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 			params.add(CommonUtils.appendLikeOperator(userDto.getSearch()));
 		}
 		if (Objects.nonNull(userDto.getSignedUserId()) && userDto.getSignedUserId() > 1) {
-			sb.append(" AND user.id = ? ");
+			sb.append(" and user.id = ? ");
 			params.add(userDto.getSignedUserId());
 		}
 		return sb.toString();
@@ -55,6 +55,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 		WrapperDto<UserDto> wrapperDto = new WrapperDto<>();
 		List<UserDto> users = new ArrayList<>();
 		List<Object> params = new ArrayList<>();
+
 		try {
 //			searchUserDto.setSignedUserName(userEntity.getUserName());
 
@@ -95,6 +96,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 		logger.debug("Repository :: getUsersCount :: Entered");
 		Long totalRecords = null;
 		List<Object> params = new ArrayList<>();
+
 		try {
 			Query query = entityManager.createNativeQuery(get_users_count.apply(userDto, params));
 			int count = 1;

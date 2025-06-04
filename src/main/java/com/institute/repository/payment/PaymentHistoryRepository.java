@@ -18,4 +18,7 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistoryEn
 	@Query(value = "select * from payment_history where payment_id  = :paymentId ", nativeQuery = true)
 	List<PaymentHistoryEntity> getPaymentHistoryByPaymentId(@Param("paymentId") Long paymentId);
 
+	@Query(value = "select sum(history_amount_paid) from  payment_history where payment_id = :paymentId ", nativeQuery = true)
+	double getOverallPaidAmountCount(@Param("paymentId") Long paymentId);
+
 }

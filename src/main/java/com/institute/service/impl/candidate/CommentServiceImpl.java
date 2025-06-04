@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.institute.dto.WrapperDto;
 import com.institute.dto.candidate.CommentDto;
@@ -119,11 +120,12 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	@Override
-	public WrapperDto<CommentDto> getCommentRemindInDashboard(CommentDto commentDto) {
+	public WrapperDto<CommentDto> getCommentRemindInDashboard(CommentDto commentDto,
+			@RequestHeader("username") String username) {
 		logger.debug("Service :: getCommentRemindInDashboard :: Entered");
 		WrapperDto<CommentDto> wrapperDto = null;
 		try {
-			wrapperDto = commentRepositoryCustom.getComments(commentDto);
+			wrapperDto = commentRepositoryCustom.getComments(commentDto, username);
 
 		} catch (Exception e) {
 			logger.error("Service :: getCommentRemindInDashboard :: Exception :: " + e.getMessage());

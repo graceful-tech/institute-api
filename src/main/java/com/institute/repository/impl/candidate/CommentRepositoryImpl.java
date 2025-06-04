@@ -72,7 +72,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 		sb.append("select  candidate.name candidate_name, comment.comment, comment.created_date, "
 				+ "user.name user_name , candidate.id candidate_id  from comments comment "
 				+ "join candidates candidate on candidate.id = comment.candidate_id "
-				+ "join users user on user.id = comment.user_id where comment_reminder = 1 ");
+				+ "join user user on user.id = comment.user_id where 1 = 1 ");
 
 		String parameters = get_comments_reminder_parameters.apply(commentDto, params);
 
@@ -86,6 +86,12 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 			params.add(commentDto.getSignedUserId());
 		}
 
+		if (Objects.nonNull(commentDto.getUserId())) {
+			sb.append(" and comment.user_id = ? ");
+
+			params.add(commentDto.getSignedUserId());
+		}
+
 		sb.append(" order by comment.created_date desc");
 
 		return sb.toString();
@@ -93,14 +99,18 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public WrapperDto<CommentDto> getComments(CommentDto commentDto) {
+	public WrapperDto<CommentDto> getComments(CommentDto commentDto, String userName) {
 		logger.debug("Repository :: getComments :: Entered");
 		WrapperDto<CommentDto> wrapperDto = new WrapperDto<>();
 		List<CommentDto> comments = new ArrayList<>();
 		List<Object> params = new ArrayList<>();
 		try {
 
-			commentDto.setSignedUserId(userRepository.getUserId(commentDto.getUserName()));
+			commentDto.setSignedUserId(userRepository.getUserId(userName));
+
+			if (Objects.nonNull(commentDto.getUserName()) && !commentDto.getUserName().isEmpty()) {
+				commentDto.setUserId(userRepository.getUserId(userName));
+			}
 
 			Query query = entityManager.createNativeQuery(get_comments_reminder.apply(commentDto, params));
 
@@ -116,14 +126,14 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 
 				comment.setCandidateName((String) result[0]);
 				comment.setComment((String) result[1]);
+
 				Timestamp createdDate = (Timestamp) result[2];
 
 				if (Objects.nonNull(createdDate)) {
 					comment.setCreatedDate(createdDate.toLocalDateTime());
 				}
-
 				comment.setUserName((String) result[3]);
-				// Here AppliedJobId using as candidate id
+				comment.setCandidateId((Long) result[4]);
 				comments.add(comment);
 			});
 

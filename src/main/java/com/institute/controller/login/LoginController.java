@@ -28,14 +28,16 @@ public class LoginController extends BaseController {
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
 		logger.debug("LoginController :: login :: Entered");
-		UserDto userDto = null;
 
-		userDto = loginService.findByMobileNumber(loginDto);
+		UserDto userDto = loginService.findByMobileNumber(loginDto);
+
 		logger.debug("LoginController :: userLogin :: Exited");
+
 		if (userDto != null) {
 			return ResponseEntity.ok(userDto);
 		}
 		logger.debug("LoginController :: userLogin :: Error");
+
 		return new ResponseEntity<>(buildResponse(CommonConstants.I_0005), HttpStatus.BAD_REQUEST);
 	}
 

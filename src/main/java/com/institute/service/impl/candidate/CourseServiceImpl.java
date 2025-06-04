@@ -43,12 +43,12 @@ public class CourseServiceImpl implements CourseService {
 			courseEntity = courseRepository.getCourseByCandidateId(courseDto.getCandidateId());
 
 			if (Objects.nonNull(courseEntity)) {
-				course = modelMapper.map(courseDto, CourseEntity.class);
-				course.setModifiedDate(LocalDateTime.now());
-				course.setModifiedUser(userRepository.getUserId(username));
-				course.setCandidateId(courseDto.getCandidateId());
+				courseEntity = modelMapper.map(courseDto, CourseEntity.class);
+				courseEntity.setModifiedDate(LocalDateTime.now());
+				courseEntity.setModifiedUser(userRepository.getUserId(username));
+				courseEntity.setCandidateId(courseDto.getCandidateId());
 
-				saveCourseEntity = courseRepository.save(course);
+				saveCourseEntity = courseRepository.save(courseEntity);
 
 				id = saveCourseEntity.getId();
 			} else {

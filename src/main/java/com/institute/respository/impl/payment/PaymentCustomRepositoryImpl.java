@@ -1,8 +1,6 @@
 package com.institute.respository.impl.payment;
 
 import java.lang.ref.WeakReference;
-import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -15,8 +13,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.institute.dto.WrapperDto;
+import com.institute.dto.payment.DashboardPaymentDto;
 import com.institute.dto.payment.SearchPaymentDto;
 import com.institute.repository.payment.PaymentCustomRepository;
+import com.institute.repository.user.UserRepository;
 import com.institute.utility.CommonUtils;
 
 import jakarta.persistence.EntityManager;
@@ -29,6 +29,9 @@ public class PaymentCustomRepositoryImpl implements PaymentCustomRepository {
 
 	@Autowired
 	EntityManager entityManager;
+
+	@Autowired
+	UserRepository userRepository;
 
 	private static final BiFunction<SearchPaymentDto, List<Object>, String> search_payment_parameters = (
 			searchPaymentDto, params) -> {
@@ -214,6 +217,92 @@ public class PaymentCustomRepositoryImpl implements PaymentCustomRepository {
 		logger.debug("Repository :: getSearchPaymentCount :: Exited");
 		return totalRecords;
 
+	}
+
+	private static final BiFunction<DashboardPaymentDto, List<Object>, String> search_dashboard_payment = (
+			dashboardPaymentDto, params) -> {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(
+				"select SUM(history_sum.amount_paid) AS amount_paid, SUM(payment.balance_amount) AS balance_amount FROM payment "
+						+ "left join (select payment_id, SUM(history_amount_paid) AS amount_paid from payment_history group by payment_id) "
+						+ "history_sum ON history_sum.payment_id = payment.id  where 1=1 ");
+
+		if (dashboardPaymentDto.getLoggedUserId() != 1) {
+			sb.append("and payment.modified_user = ? ");
+			params.add(dashboardPaymentDto.getLoggedUserId());
+		}
+
+		if (Objects.nonNull(dashboardPaymentDto.getUserId())) {
+			sb.append("and payment.modified_user = ? ");
+			params.add(dashboardPaymentDto.getUserId());
+		}
+
+		if (Objects.nonNull(dashboardPaymentDto.getFilterType())) {
+
+			if (dashboardPaymentDto.getFilterType().equalsIgnoreCase("TODAY")) {
+				sb.append(" and date(payment.modified_date) = curdate()");
+			} else if (dashboardPaymentDto.getFilterType().equalsIgnoreCase("THIS WEEK")) {
+				sb.append(" and week(payment.modified_date) = week(now())");
+			} else if (dashboardPaymentDto.getFilterType().equalsIgnoreCase("CUSTOM")
+					&& Objects.nonNull(dashboardPaymentDto.getFromDate())
+					&& Objects.nonNull(dashboardPaymentDto.getToDate())) {
+				sb.append(
+						" and (date(payment.modified_date) between str_to_date(?, '%Y-%m-%d') and str_to_date(?, '%Y-%m-%d'))");
+				params.add(dashboardPaymentDto.getFromDate());
+				params.add(dashboardPaymentDto.getToDate());
+			}
+		}
+		return sb.toString();
+	};
+
+	@Override
+	public WrapperDto<DashboardPaymentDto> getDashboardPayments(DashboardPaymentDto dashboardPaymentDto,
+			Pageable pageable) {
+		logger.debug("Repository :: getDashboardPayments :: Entered");
+
+		List<Object> params = new ArrayList<>();
+		WrapperDto<DashboardPaymentDto> wrapperDto = new WrapperDto<>();
+		List<DashboardPaymentDto> dashboardPaymentList = new ArrayList<>();
+		WeakReference<List<DashboardPaymentDto>> weakListRef = new WeakReference<>(dashboardPaymentList);
+
+		try {
+
+			if (Objects.nonNull(dashboardPaymentDto.getUserName())) {
+				dashboardPaymentDto.setUserId(userRepository.getUserId(dashboardPaymentDto.getUserName()));
+			}
+
+			Query query = entityManager.createNativeQuery(search_dashboard_payment.apply(dashboardPaymentDto, params));
+
+			int count = 1;
+			for (Object param : params) {
+				query.setParameter(count++, param);
+			}
+
+			query.setFirstResult((pageable.getPageNumber() - 1) * pageable.getPageSize());
+			query.setMaxResults(pageable.getPageSize());
+
+			List<Object[]> results = query.getResultList();
+
+			results.forEach(result -> {
+				DashboardPaymentDto dashboardPayment = new DashboardPaymentDto();
+
+				dashboardPayment.setAmountPaid(result[0] != null ? ((Double) result[0]).doubleValue() : 0.0);
+				dashboardPayment.setBalanceAmount(result[1] != null ? ((Double) result[1]).doubleValue() : 0.0);
+
+				weakListRef.get().add(dashboardPayment);
+				dashboardPayment = null;
+
+			});
+
+			wrapperDto.setResults(dashboardPaymentList);
+
+		} catch (Exception e) {
+			logger.error("Repository :: getDashboardPayments :: Exception :: " + e.getMessage());
+		}
+		logger.debug("Repository :: getDashboardPayments :: Exited");
+		return wrapperDto;
 	}
 
 }

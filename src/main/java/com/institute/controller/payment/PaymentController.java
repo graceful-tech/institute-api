@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.institute.dto.WrapperDto;
+import com.institute.dto.payment.DashboardPaymentDto;
 import com.institute.dto.payment.PaymentDto;
 import com.institute.dto.payment.PaymentHistoryDto;
 import com.institute.dto.payment.SearchPaymentDto;
@@ -65,11 +66,23 @@ public class PaymentController {
 
 	@GetMapping("/history/{id}")
 	public ResponseEntity<?> getPaymentHistory(@PathVariable Long id, @RequestHeader("username") String username) {
-		logger.debug("Controller :: getPayment :: Entered");
+		logger.debug("Controller :: getPaymentHistory :: Entered");
 
 		List<PaymentHistoryDto> historyDto = paymentService.getPaymentHistoryBypaymentId(id, username);
 
-		logger.debug("Controller :: getPayment :: Exited");
+		logger.debug("Controller :: getPaymentHistory :: Exited");
+
+		return new ResponseEntity<>(historyDto, HttpStatus.OK);
+	}
+
+	@PostMapping("/dashboard")
+	public ResponseEntity<?> getDashboardPayment(@RequestBody DashboardPaymentDto dashboardPaymentDto,
+			@RequestHeader("username") String username) {
+		logger.debug("Controller :: getDashboardPayment :: Entered");
+
+		WrapperDto<DashboardPaymentDto> historyDto = paymentService.getDashboardPayment(dashboardPaymentDto, username);
+
+		logger.debug("Controller :: getDashboardPayment :: Exited");
 
 		return new ResponseEntity<>(historyDto, HttpStatus.OK);
 	}

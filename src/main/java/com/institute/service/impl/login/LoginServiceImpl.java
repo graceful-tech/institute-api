@@ -28,7 +28,8 @@ public class LoginServiceImpl implements LoginService {
 
 	@Override
 	public UserDto findByMobileNumber(LoginDto loginDto) {
-		logger.debug("LoginServiceImpl :: findByMobileNumber :: Exited");
+		logger.debug("Service :: findByMobileNumber :: Exited");
+
 		UserDto userDto = null;
 		UserEntity userEntity = null;
 		try {
@@ -38,9 +39,10 @@ public class LoginServiceImpl implements LoginService {
 				userDto = modelMapper.map(userEntity, UserDto.class);
 			}
 		} catch (Exception e) {
-			logger.debug("LoginServiceImpl :: userLogin :: findByMobileNumber" + e.getMessage());
+			logger.error("Service :: userLogin :: findByMobileNumber" + e.getMessage());
 		}
-		logger.debug("LoginServiceImpl :: findByMobileNumber :: Exited");
+
+		logger.debug("Service :: findByMobileNumber :: Exited");
 		userEntity = null;
 		return userDto;
 	}

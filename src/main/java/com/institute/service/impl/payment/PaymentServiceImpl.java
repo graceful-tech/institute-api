@@ -1,5 +1,7 @@
 package com.institute.service.impl.payment;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import com.institute.dto.WrapperDto;
 import com.institute.dto.payment.PaymentHistoryDto;
+import com.institute.dto.payment.DashboardPaymentDto;
 import com.institute.dto.payment.PaymentDto;
 import com.institute.dto.payment.SearchPaymentDto;
 import com.institute.entity.payment.PaymentEntity;
@@ -46,10 +49,19 @@ public class PaymentServiceImpl implements PaymentService {
 	@Autowired
 	PaymentHistoryRepository paymentHistoryRepository;
 
+	private final RoundingMode ROUNDING_MODE = RoundingMode.HALF_UP;
+
+	private boolean isDifferent(double a, double b) {
+		BigDecimal bd1 = BigDecimal.valueOf(a).setScale(2, ROUNDING_MODE);
+		BigDecimal bd2 = BigDecimal.valueOf(b).setScale(2, ROUNDING_MODE);
+		return bd1.compareTo(bd2) != 0;
+	}
+
 	@Override
 	public Long savePayment(PaymentDto paymentDto, String username) {
+		logger.debug("Service :: savePayment :: Entered");
 
-		logger.debug("Service :: createCourse :: Entered");
+		boolean hasUpdated = false;
 
 		PaymentEntity paymentEntity = null;
 		PaymentEntity payment = null;
@@ -57,19 +69,63 @@ public class PaymentServiceImpl implements PaymentService {
 		Long id = null;
 
 		try {
-
 			paymentEntity = paymentRepository.getPaymentByCandidateId(paymentDto.getCandidateId());
 
 			if (Objects.nonNull(paymentEntity)) {
-				payment = modelMapper.map(paymentDto, PaymentEntity.class);
-				payment.setModifiedDate(LocalDateTime.now());
-				payment.setModifiedUser(userRepository.getUserId(username));
-				payment.setCreatedUserName(paymentEntity.getCreatedUserName());
-				payment.setCandidateId(paymentDto.getCandidateId());
+				// payment = modelMapper.map(paymentDto, PaymentEntity.class);
+				paymentEntity.setModifiedDate(LocalDateTime.now());
+				paymentEntity.setModifiedUser(userRepository.getUserId(username));
+				paymentEntity.setCandidateId(paymentDto.getCandidateId());
 
-				savepaymentEntity = paymentRepository.save(payment);
+				if (Objects.nonNull(paymentDto.getCourseFees())
+						&& isDifferent(paymentDto.getCourseFees(), paymentEntity.getCourseFees())) {
 
-				id = savepaymentEntity.getId();
+					paymentEntity.setCourseFees(paymentDto.getCourseFees());
+					hasUpdated = true;
+				}
+
+				if (Objects.nonNull(paymentDto.getAmountPaid()) && paymentDto.getAmountPaid() > 0.0
+						&& isDifferent(paymentDto.getAmountPaid(), paymentEntity.getAmountPaid())) {
+
+					paymentEntity.setAmountPaid(paymentDto.getAmountPaid());
+					hasUpdated = true;
+				}
+
+				if (Objects.nonNull(paymentDto.getBalanceAmount())
+						&& isDifferent(paymentDto.getBalanceAmount(), paymentEntity.getBalanceAmount())) {
+
+					paymentEntity.setBalanceAmount(paymentDto.getBalanceAmount());
+					hasUpdated = true;
+				}
+
+				if (Objects.nonNull(paymentDto.getDiscount())
+						&& isDifferent(paymentDto.getDiscount(), paymentEntity.getDiscount())) {
+
+					paymentEntity.setDiscount(paymentDto.getDiscount());
+					hasUpdated = true;
+				}
+
+				if (Objects.nonNull(paymentDto.getPaymentMode())
+						&& !Objects.equals(paymentDto.getPaymentMode(), paymentEntity.getPaymentMode())) {
+
+					paymentEntity.setPaymentMode(paymentDto.getPaymentMode());
+					hasUpdated = true;
+				}
+
+				if (Objects.nonNull(paymentDto.getPaidDate())
+						&& !paymentDto.getPaidDate().equals(paymentEntity.getPaidDate())) {
+
+					paymentEntity.setPaidDate(paymentDto.getPaidDate());
+					hasUpdated = true;
+				}
+
+				if (hasUpdated) {
+					savepaymentEntity = paymentRepository.save(paymentEntity);
+					id = savepaymentEntity.getId();
+
+					savePaymenthistory(paymentDto, username, id);
+				}
+
 			} else {
 				payment = modelMapper.map(paymentDto, PaymentEntity.class);
 				payment.setCreatedUserName(username);
@@ -80,9 +136,9 @@ public class PaymentServiceImpl implements PaymentService {
 				savepaymentEntity = paymentRepository.save(payment);
 
 				id = savepaymentEntity.getId();
-			}
 
-			savePaymenthistory(paymentDto, username, id);
+				savePaymenthistory(paymentDto, username, id);
+			}
 
 			paymentEntity = null;
 			payment = null;
@@ -103,9 +159,17 @@ public class PaymentServiceImpl implements PaymentService {
 		PaymentDto payment = null;
 		try {
 			paymentEntity = paymentRepository.getPaymentByCandidateId(candidateId);
+
+			double overallPaidAmountCount = paymentHistoryRepository.getOverallPaidAmountCount(candidateId);
+
+			if (Objects.nonNull(overallPaidAmountCount)) {
+				paymentEntity.setAmountPaid(overallPaidAmountCount);
+			}
+
 			payment = modelMapper.map(paymentEntity, PaymentDto.class);
 
 			paymentEntity = null;
+			overallPaidAmountCount = (Double) null;
 		} catch (Exception e) {
 			logger.error("Service :: getPaymentById :: Exception :: " + e.getMessage());
 		}
@@ -139,10 +203,11 @@ public class PaymentServiceImpl implements PaymentService {
 		PaymentHistoryEntity paymentHistoryEntity = null;
 
 		try {
+			paymentDto.setId(null);
 			historyPaymentDto.setPaymentId(paymentId);
 			historyPaymentDto.setHistoryCourseFees(paymentDto.getCourseFees());
 			historyPaymentDto.setHistoryAmountPaid(paymentDto.getAmountPaid());
-			historyPaymentDto.setHistoryBalanceAmount(paymentDto.getAmountPaid());
+			historyPaymentDto.setHistoryBalanceAmount(paymentDto.getBalanceAmount());
 			historyPaymentDto.setHistoryDiscount(paymentDto.getDiscount());
 
 			if (Objects.nonNull(paymentDto.getPaymentMode()) && !paymentDto.getPaymentMode().isEmpty()) {
@@ -198,6 +263,27 @@ public class PaymentServiceImpl implements PaymentService {
 		logger.debug("Service :: getPaymentHistoryBypaymentId :: Exited");
 		return paymentHistoryDtoList;
 
+	}
+
+	@Override
+	public WrapperDto<DashboardPaymentDto> getDashboardPayment(DashboardPaymentDto dashboardPaymentDto,
+			String username) {
+
+		logger.debug("Service :: getDashboardPayment :: Entered");
+
+		WrapperDto<DashboardPaymentDto> dashboardPayment = null;
+		try {
+
+			dashboardPaymentDto.setLoggedUserName(username);
+			dashboardPaymentDto.setLoggedUserId(userRepository.getUserId(username));
+
+			Pageable pageable = PageRequest.of(dashboardPaymentDto.getPage(), dashboardPaymentDto.getLimit());
+			dashboardPayment = paymentCustomRepository.getDashboardPayments(dashboardPaymentDto, pageable);
+		} catch (Exception e) {
+			logger.error("Service :: searchPayment :: Exception :: " + e.getMessage());
+		}
+		logger.debug("Service :: searchPayment :: Exited");
+		return dashboardPayment;
 	}
 
 }
