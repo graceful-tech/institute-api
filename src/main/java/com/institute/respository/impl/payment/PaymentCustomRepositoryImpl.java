@@ -16,6 +16,7 @@ import com.institute.dto.WrapperDto;
 import com.institute.dto.payment.DashboardPaymentDto;
 import com.institute.dto.payment.SearchPaymentDto;
 import com.institute.repository.payment.PaymentCustomRepository;
+import com.institute.repository.payment.PaymentHistoryRepository;
 import com.institute.repository.user.UserRepository;
 import com.institute.utility.CommonUtils;
 
@@ -32,6 +33,9 @@ public class PaymentCustomRepositoryImpl implements PaymentCustomRepository {
 
 	@Autowired
 	UserRepository userRepository;
+
+	@Autowired
+	PaymentHistoryRepository paymentHistoryRepository;
 
 	private static final BiFunction<SearchPaymentDto, List<Object>, String> search_payment_parameters = (
 			searchPaymentDto, params) -> {
@@ -83,11 +87,10 @@ public class PaymentCustomRepositoryImpl implements PaymentCustomRepository {
 
 		StringBuilder sb = new StringBuilder();
 
-		sb.append(
-				"select payment.id,payment.course_fees,payment.amount_paid,payment.balance_amount,payment.discount,payment.payment_mode, "
-						+ "candidate.name,candidate.mobile_number,course.course_name,course.status,course.batch_name,payment.candidate_id,payment.paid_date from payment payment "
-						+ "left join candidates candidate on candidate.id = payment.candidate_id "
-						+ "left join course course on course.candidate_id = payment.candidate_id  where 1 = 1 ");
+		sb.append("select payment.id,payment.course_fees,payment.balance_amount,payment.discount,payment.payment_mode, "
+				+ "candidate.name,candidate.mobile_number,course.course_name,course.status,course.batch_name,payment.candidate_id,payment.paid_date from payment payment "
+				+ "left join candidates candidate on candidate.id = payment.candidate_id "
+				+ "left join course course on course.candidate_id = payment.candidate_id  where 1 = 1 ");
 
 		if (searchPaymentDto.getLoggedUserId() != 1) {
 			sb.append("and payment.created_username = ? ");
@@ -135,27 +138,34 @@ public class PaymentCustomRepositoryImpl implements PaymentCustomRepository {
 
 				searchPayment.setId((Long) result[0]);
 				searchPayment.setCourseFees(result[1] != null ? ((Number) result[1]).doubleValue() : 0.0);
-				searchPayment.setAmountPaid(result[2] != null ? ((Number) result[2]).doubleValue() : 0.0);
-				searchPayment.setBalanceAmount(result[3] != null ? ((Number) result[3]).doubleValue() : 0.0);
+				searchPayment.setBalanceAmount(result[2] != null ? ((Number) result[2]).doubleValue() : 0.0);
+				searchPayment.setDiscount(result[3] != null ? ((Number) result[3]).doubleValue() : 0.0);
+				searchPayment.setPaymentMode((String) result[4]);
+				searchPayment.setName((String) result[5]);
+				searchPayment.setMobileNumber((String) result[6]);
+				searchPayment.setCourseName((String) result[7]);
+				searchPayment.setStatus((String) result[8]);
+				searchPayment.setBatchName((String) result[9]);
+				searchPayment.setCandidateId((Long) result[10]);
 
-				searchPayment.setDiscount(result[4] != null ? ((Number) result[4]).doubleValue() : 0.0);
-				searchPayment.setPaymentMode((String) result[5]);
-				searchPayment.setName((String) result[6]);
-				searchPayment.setMobileNumber((String) result[7]);
-				searchPayment.setCourseName((String) result[8]);
-				searchPayment.setStatus((String) result[9]);
-				searchPayment.setBatchName((String) result[10]);
-				searchPayment.setCandidateId((Long) result[11]);
-
-				java.sql.Date paidDate = (java.sql.Date) result[12];
+				java.sql.Date paidDate = (java.sql.Date) result[11];
 
 				if (Objects.nonNull(paidDate)) {
 					searchPayment.setPaidDate(paidDate.toLocalDate());
 				}
 
+				Double overallPaidAmountCount = paymentHistoryRepository.getOverallPaidAmountCount((Long) result[0]);
+
+				if (Objects.nonNull(overallPaidAmountCount)) {
+					searchPayment.setAmountPaid(overallPaidAmountCount);
+				} else {
+					searchPayment.setAmountPaid(0.0);
+				}
+
 				weakListRef.get().add(searchPayment);
 
 				searchPayment = null;
+				overallPaidAmountCount = null;
 
 			});
 
