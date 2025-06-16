@@ -43,13 +43,17 @@ public class CommentServiceImpl implements CommentService {
 	public boolean createComment(CommentDto commentDto, String username) {
 		logger.debug("Service :: createComment :: Entered");
 		boolean status = false;
+
 		try {
-			commentDto.setCandidateId(commentDto.getCandidateId());
 			Long userId = userRepository.getUserId(username);
 
-			CommentEntity commentEntity = convertDtoToEntity(commentDto, 1L);
+			CommentEntity commentEntity = convertDtoToEntity(commentDto, userId);
 			CommentEntity savedEntity = commentRepository.save(commentEntity);
 
+			commentEntity = null;
+			savedEntity = null;
+			userId = null;
+			
 			status = true;
 
 		} catch (Exception e) {
