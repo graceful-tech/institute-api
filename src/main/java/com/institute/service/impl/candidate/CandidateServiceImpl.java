@@ -124,6 +124,7 @@ public class CandidateServiceImpl implements CandidateService {
 		logger.debug("Service :: createCandidate :: Entered");
 
 		CandidateEntity candidateEntity = null;
+		CandidateEntity saveCandidateEntity = null;
 		CandidateEntity saveCandidate = null;
 		Long id = null;
 
@@ -134,16 +135,16 @@ public class CandidateServiceImpl implements CandidateService {
 
 			if (Objects.nonNull(candidateEntity)) {
 
-				candidateEntity = modelMapper.map(candiateDto, CandidateEntity.class);
-				candidateEntity.setId(candidateEntity.getId());
-				candidateEntity.setModifiedDate(LocalDateTime.now());
-				candidateEntity.setModifiedUser(userId);
-				candidateEntity.setCreatedUserName(candidateEntity.getCreatedUserName());
-				candidateEntity.setCreatedUser(candidateEntity.getCreatedUser());
+				saveCandidateEntity = modelMapper.map(candiateDto, CandidateEntity.class);
+				saveCandidateEntity.setId(candidateEntity.getId());
+				saveCandidateEntity.setModifiedDate(LocalDateTime.now());
+				saveCandidateEntity.setModifiedUser(userId);
+				saveCandidateEntity.setCreatedUserName(candidateEntity.getCreatedUserName());
+				saveCandidateEntity.setCreatedUser(candidateEntity.getCreatedUser());
 
-				saveCandidate = candidatesRepository.save(candidateEntity);
+				saveCandidateEntity = candidatesRepository.save(saveCandidateEntity);
 
-				id = saveCandidate.getId();
+				id = saveCandidateEntity.getId();
 			} else {
 				CandidateEntity candidate = new CandidateEntity();
 				candidate = modelMapper.map(candiateDto, CandidateEntity.class);
@@ -162,6 +163,7 @@ public class CandidateServiceImpl implements CandidateService {
 			candidateEntity = null;
 			saveCandidate = null;
 			userId = null;
+			saveCandidateEntity = null;
 		} catch (Exception e) {
 			logger.error("Service :: createCandidate :: Exception :: " + e.getMessage());
 		}
