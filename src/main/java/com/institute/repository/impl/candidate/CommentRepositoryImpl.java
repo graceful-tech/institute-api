@@ -89,7 +89,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 		if (Objects.nonNull(commentDto.getUserId())) {
 			sb.append(" and comment.user_id = ? ");
 
-			params.add(commentDto.getSignedUserId());
+			params.add(commentDto.getUserId());
 		}
 
 		sb.append(" order by comment.created_date desc");
@@ -109,7 +109,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 			commentDto.setSignedUserId(userRepository.getUserId(userName));
 
 			if (Objects.nonNull(commentDto.getUserName()) && !commentDto.getUserName().isEmpty()) {
-				commentDto.setUserId(userRepository.getUserId(userName));
+				commentDto.setUserId(userRepository.getUserId(commentDto.getUserName()));
 			}
 
 			Query query = entityManager.createNativeQuery(get_comments_reminder.apply(commentDto, params));
